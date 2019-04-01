@@ -79,8 +79,6 @@ class VoxeLand : Game, IGameState
 
     private Vector3 camPosition = new Vector3(0, 7, 0);
 
-    private Texture2D terrain;
-
     GameTime gameTime;
 
     FontRenderer font;
@@ -213,9 +211,6 @@ class VoxeLand : Game, IGameState
 
         GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 
-        FileStream filestream = new FileStream(Configuration.Path + "terrain.png", FileMode.Open);
-        terrain = Texture2D.FromStream(GraphicsDevice, filestream);
-
 
         gameTime = new GameTime();
         spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -251,8 +246,7 @@ class VoxeLand : Game, IGameState
 
 */
         
-        effect = Content.Load<Effect> ("Shadow");  
-        //tiltShiftEffect = Content.Load<Effect> ("TiltShift");
+        effect = Content.Load<Effect> ("Shader");  
 
         PresentationParameters pp = GraphicsDevice.PresentationParameters;
         renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
