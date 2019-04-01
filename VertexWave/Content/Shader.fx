@@ -105,20 +105,6 @@ struct SScenePixelToFrame
 		 curveY = curveY + (distanceX - startX) * (1 - xStartModeFactor);;
 	 }
 
-	float val = (distance + startColor) / endColor;
-	inColor.r = inColor.r * val;
-	inColor.g = inColor.g * val;
-
-
-	float valBlue = (distance + startColorBlue) / endColor;
-	inColor.b = inColor.b * valBlue;
-
-	if (distance > start) {
-		inColor.r = inColor.r - (distance - start)/20;
-		inColor.g = inColor.g - (distance - start)/20;
-		inColor.b = inColor.b - (distance - start)/20;
-	}
-
 	
 	//LOOP
 
@@ -146,6 +132,22 @@ struct SScenePixelToFrame
 	     inColor.g = inColor.g * xModeFactor;
 	     inColor.b = inColor.b * xModeFactor;
 		 
+	 }
+
+	 //COLOR
+
+	 float val = (distance + startColor) / endColor;
+	 inColor.r = inColor.r * val;
+	 inColor.g = inColor.g * val;
+
+
+	 float valBlue = (distance + startColorBlue) / endColor;
+	 inColor.b = inColor.b * valBlue;
+
+	 if (distance > start) {
+		 inColor.r = inColor.r - (distance - start) / 20;
+		 inColor.g = inColor.g - (distance - start) / 20;
+		 inColor.b = inColor.b - (distance - start) / 20;
 	 }
 
 	 loopY = loopY - distance / 10;

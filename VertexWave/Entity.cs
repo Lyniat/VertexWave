@@ -5,6 +5,7 @@ namespace VertexWave
 {
     public class Entity : Node
     {
+        public virtual bool Static { get => false; }
         public Vector3 position;
         const int CameraHeight = 2;
 
@@ -22,6 +23,10 @@ namespace VertexWave
 
         public override void Update(float deltaTime)
         {
+            if (Static)
+            {
+                return;
+            }
             currentGravivty -= 0.01f;
             if(currentGravivty < -0.3f){
                 currentGravivty = -0.3f;

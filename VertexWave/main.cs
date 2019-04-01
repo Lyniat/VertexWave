@@ -117,6 +117,9 @@ class VoxeLand : Game, IGameState
     GameStateListener gameStateListener;
 
     private Model keyboard;
+    private Model logo;
+
+    private Logo logoObject;
 
 
     //Timer
@@ -181,6 +184,7 @@ class VoxeLand : Game, IGameState
     protected override void LoadContent()
     {
         keyboard = Content.Load<Model>("keyboard");
+        logo = Content.Load<Model>("logo");
 
         basicEffect = new BasicEffect(GraphicsDevice);
 
@@ -201,7 +205,11 @@ class VoxeLand : Game, IGameState
 
         player = new Player(keyboard,new Vector3(0, WorldGenerator.PathHeight+2, 0));
 
+        logoObject = new Logo(logo, new Vector3(0, WorldGenerator.PathHeight + 20, 0));
+
         root.Add(player);
+
+        root.Add(logoObject);
 
         serialController = new SerialController(player);
 
@@ -356,7 +364,7 @@ class VoxeLand : Game, IGameState
             Reset();
         }
 
-        startModeFactor = 1 + player.position.Z / 60f;
+        startModeFactor = 1 + player.position.Z / 80f;
 
         if(startModeFactor < 0)
         {

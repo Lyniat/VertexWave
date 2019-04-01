@@ -85,6 +85,7 @@
     <Compile Include="Interfaces\IModel.cs" />
     <Compile Include="Interfaces\IPlayerMovement.cs" />
     <Compile Include="Interfaces\IWorldGenerator.cs" />
+    <Compile Include="Logo.cs" />
     <Compile Include="main.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="MeshNotifier.cs" />
