@@ -45,7 +45,6 @@
     <StartupObject>Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BasicModel.cs" />
     <Compile Include="BMFont.cs" />
     <Compile Include="BoardController\AbstractSerialThread.cs" />
     <Compile Include="BoardController\IMessageListener.cs" />
@@ -62,7 +61,6 @@
     <Compile Include="Font.cs" />
     <Compile Include="FontRenderer.cs" />
     <Compile Include="FontStyle.cs" />
-    <Compile Include="Game1.cs" />
     <Compile Include="GameStateListener.cs" />
     <Compile Include="Generators\BiomeGenerator.cs" />
     <Compile Include="Generators\Biomes.cs" />
@@ -70,7 +68,6 @@
     <Compile Include="Generators\BlockTypes\Block.cs" />
     <Compile Include="Generators\BlockTypes\BlockMatrixFloor.cs" />
     <Compile Include="Generators\BlockTypes\BlockFlower.cs" />
-    <Compile Include="Generators\StructGenerator.cs" />
     <Compile Include="Generators\Struct\Bamboo.cs" />
     <Compile Include="Generators\Struct\BigTree.cs" />
     <Compile Include="Generators\Struct\JungleTree.cs" />
@@ -88,21 +85,17 @@
     <Compile Include="Interfaces\IModel.cs" />
     <Compile Include="Interfaces\IPlayerMovement.cs" />
     <Compile Include="Interfaces\IWorldGenerator.cs" />
-    <Compile Include="Loader\WavefrontLoader.cs" />
     <Compile Include="main.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="MeshNotifier.cs" />
     <Compile Include="MonogameExtensions.cs" />
     <Compile Include="Node.cs" />
-    <Compile Include="Objects\Board.cs" />
     <Compile Include="OculusRift.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerMovementListener.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VertexPositionColorLine.cs" />
     <Compile Include="World.cs" />
-    <Compile Include="WorldLighter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

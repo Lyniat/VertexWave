@@ -21,8 +21,6 @@ namespace VertexWave
         private const int SeaLevel = 60;
 
         private static Dictionary<(int, int), ChunkStruct> world = new Dictionary<(int, int), ChunkStruct>();
-        private Block[,,] tree;
-        private Block[,,] savannahTree;
 
         private Biomes[,] biomeMap;
 
@@ -43,8 +41,6 @@ namespace VertexWave
         private FastNoise color;
 
         int seed;
-
-        private bool[,] modifiedNeighbours;
 
         private int _xPos;
         private int _zPos;
@@ -165,18 +161,6 @@ namespace VertexWave
             {
                 for (var z = 0; z < ChunkSize; z++)
                 {
-                    /*
-                    if (x + z == 0)
-                    {
-                        if (blocks[
-                                1 * 3 * ChunkSize * ChunkHeight * ChunkSize +
-                                1 * ChunkSize * ChunkHeight * ChunkSize + x * ChunkHeight * ChunkSize +
-                                0 * ChunkSize + z].id != 0)
-                        {
-                            continue;
-                        }
-                    }
-                    */
                     var worldX = xPos * ChunkSize + x;
                     var worldZ = zPos * ChunkSize + z;
 
@@ -245,82 +229,11 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                         {
                             block = Blocks.blocks[BlockIDs.Dirt];
                         }
-                        /*
-                        if (y <= height - 8)
-                        {
-                            block = Blocks.blocks[BlockIDs.Stone];
-                        }
-                        */
 
                         if (y == 0)
                         {
                             block = Blocks.blocks[BlockIDs.Dirt];
                         }
-
-
-                        /*
-                        if (y > height && y < ChunkHeight-1)
-                        {
-                            if(GetBlockAt(xPos,y,zPos,x,z) == 1){
-                                block.id = 1;
-                                block.r = 0;
-                                block.g = 255;
-                                block.b = 0;
-                            }
-                        }*/
-
-                        /*
-                        if (biomeType == Biome.Grass)
-                        {
-                            if (y <= height)
-                            {
-                                block.id = 1;
-                                block.r = 0;
-                                block.g = 255;
-                                block.b = 0;
-                            }
-                        }
-                        else
-                        {
-                            if (y <= height)
-                            {
-                                block.id = 3;
-                                block.r = 255;
-                                block.g = 255;
-                                block.b = 100;
-                                block.texture = 18;
-                            }
-                        }
-                        if (y < height - 2)
-                        {
-                            block.id = 2;
-                            block.r = 127;
-                            block.g = 127;
-                            block.b = 127;
-                            block.texture = 17;
-                        }
-                        if (y > height && y <= heigthExtra)
-                        {
-                            block.id = 2;
-                            block.r = 127;
-                            block.g = 127;
-                            block.b = 127;
-                            block.texture = 17;
-                            if (caveNoise.GetSimplexFractal(worldX, y, worldZ) > 0)
-                            {
-                                block.id = 0;
-                            }
-                            else if (y >= heigthExtra - 3)
-                            {
-                                block.id = 1;
-                                block.r = 0;
-                                block.g = 255;
-                                block.b = 0;
-                                block.texture = 0;
-                            }
-                        }
-                        
-                        */
 
                         var noiseAtX = worldX;
                         var noiseAtZ = worldZ;
@@ -335,50 +248,6 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                             noiseAtZ--;
                         }
 
-                        /*
-                        var riverNoise = riverNoiseMap[x, z];
-                        if (y == height + 1 && height > 8)
-                        {
-                            Block water = Blocks.blocks[BlockIDs.Water];
-                            Block air = Blocks.blocks[BlockIDs.Air];
-                            Block sand = Blocks.blocks[BlockIDs.Sand];
-                            sand.visible = 1;
-                            if (riverNoise > 0.93)
-                            {
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + y * (WorldGenerator.ChunkSize) + z] = air;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 1) * (WorldGenerator.ChunkSize) + z] = air;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 2) * (WorldGenerator.ChunkSize) + z] = air;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 3) * (WorldGenerator.ChunkSize) + z] = water;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 4) * (WorldGenerator.ChunkSize) + z] = water;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 5) * (WorldGenerator.ChunkSize) + z] = water;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 6) * (WorldGenerator.ChunkSize) + z] = sand;
-                            }else if (riverNoise > 0.89)
-                            {
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + y * (WorldGenerator.ChunkSize) + z] = air;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 1) * (WorldGenerator.ChunkSize) + z] = air;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 2) * (WorldGenerator.ChunkSize) + z] = sand;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 3) * (WorldGenerator.ChunkSize) + z] = sand;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 4) * (WorldGenerator.ChunkSize) + z] = sand;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 5) * (WorldGenerator.ChunkSize) + z] = sand;
-                                blocks[x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + (y - 6) * (WorldGenerator.ChunkSize) + z] = sand;
-                            }
-                        }
-
-                        */
-                        
-                        /*
-                        
-                        if (y > height && y < ChunkHeight - 1)
-                        {
-                            if (riverNoise < 0.91f && y < height + 7)
-                            {
-                                BlockIDs id = GetBlockAt(xPos, y, zPos, x, z);
-                                block = Blocks.blocks[id];
-                            }
-                        }
-                        
-                        */
-
                         blocks[
                             x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
                             y * (WorldGenerator.ChunkSize) + z] = block;
@@ -387,82 +256,6 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                     }
                 }
             }
-
-            for (var x = 0; x < ChunkSize; x++)
-            {
-                break;
-                for (var z = 0; z < ChunkSize; z++)
-                {
-                    var worldX = xPos * ChunkSize + x;
-                    var worldZ = zPos * ChunkSize + z;
-
-                    var noiseAtX = worldX;
-                    var noiseAtZ = worldZ;
-
-                    if (x == 0)
-                    {
-                        noiseAtX--;
-                    }
-
-                    if (z == 0)
-                    {
-                        noiseAtZ--;
-                    }
-
-                    var oldSeed = river.GetSeed();
-
-                    for (var i = 0; i < 8; i++)
-                    {
-
-                        river.SetSeed(oldSeed + i);
-                        var caveN = river.GetNoise(noiseAtZ, noiseAtX);
-                        if (caveN > 0.95)
-                        {
-                            int caveHeight =
-                                (int) (Math.Abs(caveNoiseHeight.GetNoise(noiseAtX, i, noiseAtZ) * ChunkHeight));
-
-                            Console.WriteLine(caveHeight);
-
-                            var size = 1;
-
-                            for (var xx = -size; xx <= size; xx++)
-                            {
-                                for (var zz = -size; zz <= size; zz++)
-                                {
-                                    for (var yy = -2; yy <= 2; yy++)
-                                    {
-                                        var newX = xx + x;
-                                        var newZ = zz + z;
-                                        var newY = yy + caveHeight;
-
-                                        if (newX > ChunkSize - 2 || newX < 1)
-                                        {
-                                            continue;
-                                        }
-
-                                        if (newZ > ChunkSize - 2 || newZ < 1)
-                                        {
-                                            continue;
-                                        }
-
-                                        if (newY > ChunkHeight - 2 || newY < 1)
-                                        {
-                                            continue;
-                                        }
-
-                                        blocks[
-                                            newX * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
-                                            newY * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.Air];
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    river.SetSeed(oldSeed);
-                }
-            }
-
 
             for (var x = 0; x < ChunkSize; x++)
             {
@@ -492,22 +285,6 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                             id == (byte) BlockIDs.Snow || id == (byte) BlockIDs.Sand || id == (byte) BlockIDs.Stone)
                         {
                             var n = (white.GetNoise(-worldX, -worldZ) + 1) / 2f;
-                            /*
-                            if (riverNoiseMap[x,z] > 0.88) //extra case if river
-                            {
-                                if (n > 0.4 )
-                                {
-                                    blocks[
-                                        x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
-                                        (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.ReedBottom];
-                                    blocks[
-                                        x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
-                                        (y + 2) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.ReedTop];
-                                    break;
-                                }
-                                
-                            }
-                            */
      
                             switch (biomeMap[x, z])
                             {
@@ -518,20 +295,20 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                                     }
                                     else if (n > 0.2)
                                     {
-                                        /*
+                                        
                                         blocks[
                                                 x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
                                                 (y + 1) * (WorldGenerator.ChunkSize) + z] =
                                             Blocks.blocks[BlockIDs.FlowerPoppy];
-                                            */
+                                            
                                     }
                                     else if (n > -0.4)
                                     {
-                                        /*
+                                        
                                         blocks[
                                             x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
                                             (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.FlowerTulip];
-                                            */
+                                            
                                     }
 
                                     break;
@@ -667,28 +444,6 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                     }
                 }
             }
-
-
-            /*
-            for (var x = 0; x < 3; x++)
-            {
-                for (var z = 0; z < 3; z++)
-                {
-                    if (x == 1 && z == 1)
-                    {
-                        continue;
-                    }
-
-                    if (!modifiedNeighbours[x, z])
-                    {
-                        continue;
-                    }
-                    //MeshNotifier.OnModified(xPos + x -1, zPos + z -1);
-                }
-            }
-            */
-
-            //CalculateLightLevel(blocks);
 
             if (calcMesh)
             {
@@ -895,80 +650,6 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
 
             return blocks;
         }
-
-
-        /*
-
-        private BlockIDs GetBlockAt(int xPos, int y, int zPos, int x, int z)
-        {
-            if (x == 0)
-            {
-                x -= 1;
-            }
-            if (z == 0)
-            {
-                z -= 1;
-            }
-            var worldX = xPos * ChunkSize + x;
-            var worldZ = zPos * ChunkSize + z;
-            BlockIDs id = BlockIDs.Air;
-
-            var multiplier = 10;
-            var digCaves = false;
-            
-            if (technicalBiome.GetValue(worldX, worldZ) < 0.3)
-            {
-                multiplier = 20;
-                digCaves = false;
-            }
-
-            if (technicalBiome.GetValue(worldX, worldZ) < 0.6)
-            {
-                multiplier = 40;
-                digCaves = true;
-            }
-            if (technicalBiome.GetValue(worldX, worldZ) < 0.9)
-            {
-                multiplier = 80;
-                digCaves = true;
-            }
-
-            var heightVal = cave.GetSimplexFractal(worldX, worldZ) * multiplier + GetHeigthAt(worldX, worldZ)*2;
-            if (y < heightVal)
-            {
-                if (!digCaves)
-                {
-                    if (y < heightVal - 6)
-                    {
-                        id = BlockIDs.Stone;
-                    }
-                    else
-                    {
-                        id = BlockIDs.Dirt;
-                    }
-                    
-                }
-                else if (cave.GetSimplexFractal(worldX, y, worldZ) > 0)
-                {
-                    if (y < heightVal - 6)
-                    {
-                        id = BlockIDs.Stone; 
-                    }
-                    else
-                    {
-                        id = BlockIDs.Dirt;
-                    }
-                }
-                /*
-                if (cave.GetSimplexFractal(worldX, y, worldZ) > 0.5)
-                {
-                    id = BlockIDs.Stone;
-                }*/
-        /*
-    }
-    return id;
-}
-*/
     }
 
     public struct ChunkStruct
