@@ -17,103 +17,40 @@
 /copy:Fonts/DejaVu_Bold.fnt
 
 #begin Fonts/DejaVu_Bold_0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/DejaVu_Bold_0.png
+/copy:Fonts/DejaVu_Bold_0.png
 
 #begin Fonts/DejaVu_Italic.fnt
 /copy:Fonts/DejaVu_Italic.fnt
 
 #begin Fonts/DejaVu_Italic_0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/DejaVu_Italic_0.png
+/copy:Fonts/DejaVu_Italic_0.png
 
 #begin Fonts/DejaVu_Regular.fnt
 /copy:Fonts/DejaVu_Regular.fnt
 
 #begin Fonts/DejaVu_Regular_0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/DejaVu_Regular_0.png
+/copy:Fonts/DejaVu_Regular_0.png
 
 #begin Fonts/Pixel_Bold.fnt
 /copy:Fonts/Pixel_Bold.fnt
 
 #begin Fonts/Pixel_Bold_0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/Pixel_Bold_0.png
+/copy:Fonts/Pixel_Bold_0.png
 
 #begin Fonts/Pixel_Italic.fnt
 /copy:Fonts/Pixel_Italic.fnt
 
 #begin Fonts/Pixel_Italic_0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/Pixel_Italic_0.png
+/copy:Fonts/Pixel_Italic_0.png
 
 #begin Fonts/Pixel_Italic_1.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/Pixel_Italic_1.png
+/copy:Fonts/Pixel_Italic_1.png
 
 #begin Fonts/Pixel_Regular.fnt
 /copy:Fonts/Pixel_Regular.fnt
 
 #begin Fonts/Pixel_Regular_0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fonts/Pixel_Regular_0.png
+/copy:Fonts/Pixel_Regular_0.png
 
 #begin Shadow.fx
 /importer:EffectImporter
