@@ -52,13 +52,7 @@
 #begin Fonts/Pixel_Regular_0.png
 /copy:Fonts/Pixel_Regular_0.png
 
-#begin Shader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Shader.fx
-
-#begin source/Keyboard.fbx
+#begin keyboard.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -71,9 +65,27 @@
 /processorParam:ResizeTexturesToPowerOfTwo=False
 /processorParam:RotationX=0
 /processorParam:RotationY=90
-/processorParam:RotationZ=0
-/processorParam:Scale=0.25
+/processorParam:RotationZ=180
+/processorParam:Scale=30
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:source/Keyboard.fbx
+/build:keyboard.obj
+
+#begin Keyboard_1001_AlbedoTransparency.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Keyboard_1001_AlbedoTransparency.png
+
+#begin Shader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shader.fx
 

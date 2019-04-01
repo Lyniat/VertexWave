@@ -14,6 +14,7 @@ float xFogGradient;
 float xFogValue;
 
 float xModeFactor;
+float xStartModeFactor;
 
 Texture xShadowMapNum;
 
@@ -84,17 +85,24 @@ struct SScenePixelToFrame
 
 	 //CURVE
 
+	 /*
 	 if (distance < -start) {
-		 curveY = curveY - (distance + start);
+		 curveY = curveY - ((distance + start)) * xStartModeFactor;
+	 }
+
+	 */
+
+	 if (distance < 0) {
+		curveY = curveY - (cos(distance/ 30) * 15 - 15) * (1-xStartModeFactor);
 	 }
 
 	 
 	 if (distanceX < -startX) {
-		 curveY = curveY - (distanceX + startX);
+		 curveY = curveY - (distanceX + startX) * (1 - xStartModeFactor);;
 	 }
 
 	 if (distanceX > startX) {
-		 curveY = curveY + (distanceX - startX);
+		 curveY = curveY + (distanceX - startX) * (1 - xStartModeFactor);;
 	 }
 
 	float val = (distance + startColor) / endColor;

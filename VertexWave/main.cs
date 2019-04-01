@@ -129,6 +129,8 @@ class VoxeLand : Game, IGameState
 
     float modeFactor = 1;
 
+    float startModeFactor = 1;
+
     public static Matrix View;
     public static Matrix Projection;
 
@@ -178,7 +180,7 @@ class VoxeLand : Game, IGameState
 
     protected override void LoadContent()
     {
-        keyboard = Content.Load<Model>("source/Keyboard");
+        keyboard = Content.Load<Model>("keyboard");
 
         basicEffect = new BasicEffect(GraphicsDevice);
 
@@ -352,6 +354,13 @@ class VoxeLand : Game, IGameState
         if(lost && sinceLost/1000 > 3)
         {
             Reset();
+        }
+
+        startModeFactor = 1 + player.position.Z / 60f;
+
+        if(startModeFactor < 0)
+        {
+            startModeFactor = 0;
         }
 
         base.Update(gameTime);
@@ -554,6 +563,7 @@ class VoxeLand : Game, IGameState
         effect.Parameters["xFogGradient"].SetValue((float)2 * 16);
         effect.Parameters["xFogColor"].SetValue(Color.CornflowerBlue.ToVector3());
         effect.Parameters["xModeFactor"].SetValue(modeFactor);
+        effect.Parameters["xStartModeFactor"].SetValue(startModeFactor);
 
         byte referenceAlpha = 0b11111111;
             
