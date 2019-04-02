@@ -66,9 +66,10 @@
     <Compile Include="Generators\Biomes.cs" />
     <Compile Include="Generators\Blocks.cs" />
     <Compile Include="Generators\BlockTypes\Block.cs" />
+    <Compile Include="Generators\BlockTypes\BlockArrowLeft.cs" />
+    <Compile Include="Generators\BlockTypes\BlockArrowRight.cs" />
     <Compile Include="Generators\BlockTypes\BlockMatrixFloor.cs" />
     <Compile Include="Generators\BlockTypes\BlockFlower.cs" />
-    <Compile Include="Generators\Struct\Bamboo.cs" />
     <Compile Include="Generators\Struct\BigTree.cs" />
     <Compile Include="Generators\Struct\JungleTree.cs" />
     <Compile Include="Generators\Struct\JungleTreeSmall.cs" />

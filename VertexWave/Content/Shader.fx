@@ -63,9 +63,9 @@ struct SScenePixelToFrame
 		 invisible = true;
 	 }
 
-	 float startColor = 40;
+	 float startColor = 60;
 
-	 float startColorBlue = 70;
+	 float startColorBlue = 90;
 
 	 float endColor = 100;
 

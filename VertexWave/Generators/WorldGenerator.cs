@@ -45,6 +45,8 @@ namespace VertexWave
         private int _xPos;
         private int _zPos;
 
+        private bool showArrows = true;
+
         //private HeightGenerator _heightGenerator;
         private BiomeGenerator _biomeGenerator;
         //private RiverGenerator _riverGenerator;
@@ -170,7 +172,12 @@ namespace VertexWave
                         var extraSize = 140 + worldZ/2;
                         if(extraSize < 0)
                         {
+                            showArrows = false;
                             extraSize = 0;
+                        }
+                        else
+                        {
+                            showArrows = true;
                         }
                         var path = Math.Sin(worldZ / 15f) * 5f + Math.Sin(worldZ / 20f) * 3f + Math.Sin(worldZ / 50f) * 15f;
 
@@ -257,7 +264,7 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                 }
             }
 
-            for (var x = 0; x < ChunkSize; x++)
+                    for (var x = 0; x < ChunkSize; x++)
             {
                 
                 for (var z = 0; z < ChunkSize; z++)
@@ -323,7 +330,7 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                                     {
                                         blocks[
                                             x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
-                                            (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.PlantSnow];
+                                            (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.Plant];
                                     }
 
                                     break;
@@ -354,11 +361,6 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                                             x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
                                             (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.FlowerPoppy];
                                             
-                                    }
-                                    else
-                                    {
-                                        if(cell.GetNoise(x,z)  > 0.1)
-                                        new Bamboo(x, y, z, blocks);
                                     }
 
 
@@ -443,6 +445,45 @@ y * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.MatrixFloor];
                         }
                     }
                 }
+            }
+
+            if (showArrows)
+            {
+
+                for (var z = 1; z < ChunkSize - 1; z += 4)
+                {
+                    for (var x = 1; x < ChunkSize - 1; x++)
+                    {
+                        var y = PathHeight;
+
+                        if (blocks[
+    (x + 1) * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
+    y * (WorldGenerator.ChunkSize) + z].id == (byte)BlockIDs.MatrixFloor &&
+    blocks[
+    (x - 1) * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
+    y * (WorldGenerator.ChunkSize) + z].id == (byte)BlockIDs.Air)
+                        {
+                            blocks[
+    x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
+    (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.ArrowRight];
+                        }
+
+
+                        if (blocks[
+    (x - 1) * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
+    y * (WorldGenerator.ChunkSize) + z].id == (byte)BlockIDs.MatrixFloor &&
+    blocks[
+    (x + 1) * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
+    y * (WorldGenerator.ChunkSize) + z].id == (byte)BlockIDs.Air)
+                        {
+                            blocks[
+    x * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) +
+    (y + 1) * (WorldGenerator.ChunkSize) + z] = Blocks.blocks[BlockIDs.ArrowLeft];
+                        }
+
+                    }
+                }
+
             }
 
             if (calcMesh)

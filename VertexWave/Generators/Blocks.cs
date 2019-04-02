@@ -174,92 +174,7 @@ namespace VertexWave.Generators
             poppy.textureSide = 253;
             poppy.renderer = flowerRenderer;
             poppy.passable = 1;
-            blocks[BlockIDs.FlowerPoppy] = poppy;
-            
-            var bush = new Block();
-            bush.r = 255;
-            bush.g = 255;
-            bush.b = 255;
-            bush.id = (byte)BlockIDs.Bush;
-            bush.visible = 1;
-            bush.textureTop = 16;
-            bush.textureSide = 16;
-            bush.renderer = defRenderer;
-            bush.passable = 1;
-            blocks[BlockIDs.Bush] = bush;
-            
-            var vine = new Block();
-            vine.r = 255;
-            vine.g = 255;
-            vine.b = 255;
-            vine.id = (byte)BlockIDs.Vine;
-            vine.visible = 1;
-            vine.textureTop = 252;
-            vine.textureSide = 252;
-            vine.renderer = defRenderer;
-            vine.passable = 1;
-            blocks[BlockIDs.Vine] = vine;
-            
-            var plantSnow = new Block();
-            plantSnow.r = 255;
-            plantSnow.g = 200;
-            plantSnow.b = 255;
-            plantSnow.id = (byte)BlockIDs.PlantSnow;
-            plantSnow.visible = 1;
-            plantSnow.textureTop = 38;
-            plantSnow.textureSide = 38;
-            plantSnow.renderer = defRenderer;
-            plantSnow.passable = 1;
-            blocks[BlockIDs.PlantSnow] = plantSnow;
-            
-            var reedBottom = new Block();
-            reedBottom.r = 255;
-            reedBottom.g = 200;
-            reedBottom.b = 255;
-            reedBottom.id = (byte)BlockIDs.ReedBottom;
-            reedBottom.visible = 1;
-            reedBottom.textureTop = 251;
-            reedBottom.textureSide = 251;
-            reedBottom.renderer = defRenderer;
-            reedBottom.passable = 1;
-            blocks[BlockIDs.ReedBottom] = reedBottom;
-            
-            var reedTop = new Block();
-            reedTop.r = 255;
-            reedTop.g = 200;
-            reedTop.b = 255;
-            reedTop.id = (byte)BlockIDs.ReedTop;
-            reedTop.visible = 1;
-            reedTop.textureTop = 235;
-            reedTop.textureSide = 235;
-            reedTop.renderer = defRenderer;
-            reedTop.passable = 1;
-            blocks[BlockIDs.ReedTop] = reedTop;
-            
-            var bamboo = new Block();
-            bamboo.r = 255;
-            bamboo.g = 255;
-            bamboo.b = 255;
-            bamboo.id = (byte)BlockIDs.Bamboo;
-            bamboo.visible = 1;
-            bamboo.textureTop = 234;
-            bamboo.textureSide = 250;
-            bamboo.textureBottom = 218; // no bottom but extra leaves
-            bamboo.renderer = defRenderer;
-            blocks[BlockIDs.Bamboo] = bamboo;
-            
-            
-            var plantJungle = new Block();
-            plantJungle.r = 150;
-            plantJungle.g = 255; // more green then normal plant
-            plantJungle.b = 150;
-            plantJungle.id = (byte)BlockIDs.PlantJungle;
-            plantJungle.visible = 1;
-            plantJungle.textureTop = 39;
-            plantJungle.textureSide = 39;
-            plantJungle.renderer = defRenderer;
-            plantJungle.passable = 1;
-            blocks[BlockIDs.PlantJungle] = plantJungle;
+            blocks[BlockIDs.FlowerPoppy] = poppy; 
 
             var matrixFloor = new Block();
             matrixFloor.r = 255;
@@ -306,6 +221,27 @@ namespace VertexWave.Generators
             dummy.renderer = matrixRenderer;
             blocks[BlockIDs.Dummy] = dummy;
 
+            var blockArrowRightRenderer = new BlockArrowRight();
+            var blockArrowRight = new Block();
+            blockArrowRight.r = 255;
+            blockArrowRight.g = 255;
+            blockArrowRight.b = 0;
+            blockArrowRight.id = (byte)BlockIDs.ArrowRight;
+            blockArrowRight.visible = 1;
+            blockArrowRight.renderer = blockArrowRightRenderer;
+            blocks[BlockIDs.ArrowRight] = blockArrowRight;
+
+            var blockArrowLeftRenderer = new BlockArrowLeft();
+            var blockArrowLeft = new Block();
+            blockArrowLeft.r = 255;
+            blockArrowLeft.g = 255;
+            blockArrowLeft.b = 0;
+            blockArrowLeft.id = (byte)BlockIDs.ArrowLeft;
+            blockArrowLeft.visible = 1;
+            blockArrowLeft.renderer = blockArrowLeftRenderer;
+            blocks[BlockIDs.ArrowLeft] = blockArrowLeft;
+
+
         }
     }
 
@@ -325,16 +261,11 @@ namespace VertexWave.Generators
         LeavesOrange = 12,
         LeavesGreen = 13,
         FlowerPoppy = 14,
-        Bush = 15,
-        Vine = 16,
-        PlantSnow = 17,
-        ReedBottom = 18,
-        ReedTop = 19,
-        Bamboo = 20,
-        PlantJungle = 21,
-        MatrixFloor = 22,
-        MatrixFloorSafety = 23,
-        FlowerTulip = 24,
-        Dummy = 25
+        MatrixFloor = 15,
+        MatrixFloorSafety = 16,
+        FlowerTulip = 17,
+        Dummy = 18,
+        ArrowRight = 19,
+        ArrowLeft = 20
     }
 }

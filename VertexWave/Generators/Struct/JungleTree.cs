@@ -51,9 +51,6 @@ namespace Voxeland.Generators.Struct
                     {
                         CreateLeavesAt(x+xx,y+yy,z);
                     }
-                    
-                    //random vines
-                    CreateVine(x+xx,y+yy - 2,z);
                 }
 
                 if (yy >= 6 && yy <= height-3)
@@ -73,8 +70,6 @@ namespace Voxeland.Generators.Struct
                     {
                         CreateLeavesAt(x,y+yy,z+zz);
                     }
-                    //random vines
-                    CreateVine(x,y+yy - 2,z+zz);
                 }
 
                 if (yy >= 9 && yy <= height-3)
@@ -95,9 +90,6 @@ namespace Voxeland.Generators.Struct
                     {
                         CreateLeavesAt(x-xx,y+yy,z);
                     }
-                    
-                    //random vines
-                    CreateVine(x-xx,y+yy - 2,z);
                 }
 
                 if (yy >= 9 && yy <= height-2)
@@ -118,9 +110,6 @@ namespace Voxeland.Generators.Struct
                     {
                         CreateLeavesAt(x,y+yy,z-zz);
                     }
-                    
-                    //random vines
-                    CreateVine(x,y+yy - 2,z-zz);
                 }
 
                 if (yy == height - 1)
@@ -187,22 +176,6 @@ namespace Voxeland.Generators.Struct
                     }
                     AddBlock(x + xxx, y + yyy, z + zzz, BlockIDs.LeavesGreen);
                 }
-            }
-        }
-    }
-
-    private void CreateVine(int x, int y, int z)
-    {
-        if (r.Next(5) == 1)
-        {
-            var length = r.Next(3, 7);
-            for (var yy = 0; yy < length; yy++)
-            {
-                if (GetBlock(x, y - yy, z) != BlockIDs.Air)
-                {
-                    continue;
-                }
-                AddBlock(x, y - yy, z, BlockIDs.Vine);
             }
         }
     }
