@@ -13,6 +13,8 @@ using OculusRiftLib;
 using TrueCraft.Client.Rendering;
 using VertexWave;
 using Voxeland;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 class Program
 {
@@ -121,6 +123,8 @@ class VoxeLand : Game, IGameState
 
     private Logo logoObject;
 
+    private List<Song> musicTracks;
+
 
     //Timer
     private long sinceLoaded = 0;
@@ -136,6 +140,8 @@ class VoxeLand : Game, IGameState
 
     public static Matrix View;
     public static Matrix Projection;
+
+    private Random random;
 
     public static long CurrentTimeMillis()
     {
@@ -183,6 +189,7 @@ class VoxeLand : Game, IGameState
 
     protected override void LoadContent()
     {
+        random = new Random(DateTime.Now.Millisecond);
         keyboard = Content.Load<Model>("keyboard");
         logo = Content.Load<Model>("logo");
 
@@ -268,6 +275,20 @@ class VoxeLand : Game, IGameState
             for (int eye = 0; eye < 2; eye++) {
                 renderTargetEye[eye] = rift.CreateRenderTargetForEye(eye);
             }
+
+        LoadMusic();
+    }
+
+    private void LoadMusic()
+    {
+        musicTracks = new List<Song>();
+        musicTracks.Add(Content.Load<Song>("music/activation"));
+        musicTracks.Add(Content.Load<Song>("music/escape-from-reality"));
+        musicTracks.Add(Content.Load<Song>("music/impact"));
+        musicTracks.Add(Content.Load<Song>("music/overtake"));
+        musicTracks.Add(Content.Load<Song>("music/sequential-movement"));
+        musicTracks.Add(Content.Load<Song>("music/street-traffic"));
+        musicTracks.Add(Content.Load<Song>("music/turismo"));
     }
 
     /*
@@ -358,6 +379,11 @@ class VoxeLand : Game, IGameState
         }
 
         Console.WriteLine(sinceLost);
+
+        if (lost)
+        {
+            MediaPlayer.Volume = 1 - (sinceLost / 3000f);
+        }
 
         if(lost && sinceLost/1000 > 3)
         {
@@ -699,10 +725,16 @@ class VoxeLand : Game, IGameState
     {
         sinceStarted = 0;
         started = true;
+
+        var trackNum = random.Next(0, musicTracks.Count);
+
+        MediaPlayer.Play(musicTracks[trackNum]);
+        MediaPlayer.Volume = 1;
     }
 
     public void LoadedGame()
     {
+        MediaPlayer.Stop();
         sinceLoaded = 0;
         sinceStarted = 0;
         lost = false;

@@ -114,6 +114,48 @@
 /processorParam:TextureFormat=Color
 /build:logo_img.png
 
+#begin music/activation.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/activation.mp3
+
+#begin music/escape-from-reality.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/escape-from-reality.mp3
+
+#begin music/impact.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/impact.mp3
+
+#begin music/overtake.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/overtake.mp3
+
+#begin music/sequential-movement.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/sequential-movement.mp3
+
+#begin music/street-traffic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/street-traffic.mp3
+
+#begin music/turismo.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/turismo.mp3
+
 #begin Shader.fx
 /importer:EffectImporter
 /processor:EffectProcessor

@@ -36,6 +36,8 @@ namespace VertexWave
         bool started = false;
         float drift = 0;
 
+        const float ControllerSensitivity = 1.75f;
+
         Vector3 boardDirection = Vector3.Zero;
 
         protected override Vector3[] BoundingBox => new Vector3[]
@@ -97,7 +99,8 @@ namespace VertexWave
             var direction = new Vector3(0, 0, -1);
             direction += boardDirection/ -15f;
             var speed = 0.018f;
-            Move(direction * speed * deltaTime * isMoving);
+            var speedVector = new Vector3(speed * ControllerSensitivity, 0, speed);
+            Move(direction * speedVector * deltaTime * isMoving);
             playerMovementListener.PlayerMovedX(position.X);
             playerMovementListener.PlayerMovedZ(position.Z);
 
