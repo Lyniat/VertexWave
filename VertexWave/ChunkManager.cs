@@ -136,8 +136,6 @@ namespace VertexWave
 
         private void Loop()
         {
-            Console.WriteLine("loop");
-            //new PlayerMovementListener().Add(this);
             while (true)
             {
                 OwnUpdate();
@@ -181,8 +179,6 @@ namespace VertexWave
                     //Console.WriteLine("null");
                 }
 
-                Console.WriteLine("not null");
-
                 var x = nextPosition.Item1;
                 var z = nextPosition.Item2;
 
@@ -219,36 +215,6 @@ namespace VertexWave
             //mesh.Translation = new Vector3(xPos * WorldGenerator.ChunkSize, yPos, zPos * WorldGenerator.ChunkSize); TODO: change to fna
 
             return mesh;
-        }
-
-        private void AddModel(Block[,,] world, Block[,,] model, int xPos, int yPos, int zPos, int deltaX, int deltaY,
-            int deltaZ)
-        {
-            for (var x = 0; x < model.GetLength(0); x++)
-            {
-                for (var y = 0; y < model.GetLength(1); y++)
-                {
-                    for (var z = 0; z < model.GetLength(2); z++)
-                    {
-                        if (model[x, y, z].id == 0)
-                        {
-                            continue;
-                        }
-
-                        var finalXPos = xPos + deltaX + x;
-                        var finalYPos = yPos + deltaY + y;
-                        var finalZPos = zPos + deltaZ + z;
-
-                        if (finalXPos < 0 || finalXPos > world.GetLength(0) - 1 || finalYPos < 0 ||
-                            finalYPos > world.GetLength(1) - 1 || finalZPos < 0 || finalZPos > world.GetLength(2) - 1)
-                        {
-                            continue;
-                        }
-
-                        world[finalXPos, finalYPos, finalZPos] = model[x, y, z];
-                    }
-                }
-            }
         }
 
         private void CalculatePosition()

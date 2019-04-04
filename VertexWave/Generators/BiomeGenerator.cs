@@ -22,37 +22,7 @@ namespace VertexWave.Generators
         
         public Biomes[,] GetBiomemapAt(int x, int z)
         {
-            for (var xx = -1; xx <= 1; xx++)
-            {
-                for (var zz = -1; zz <= 1; zz++)
-                {
-                    var found = false;
-                    foreach (var entry in biomemapList)
-                    {
-                        if (entry.Item1 == x + xx && entry.Item2 == z + zz)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        var biomeMap = CreateBiomeMapAt(x + xx, z + zz);
-                        biomemapList.Add((x+xx, z+ zz, biomeMap));
-                    }
-                } 
-            }
-            
-            foreach (var entry in biomemapList)
-            {
-                if (entry.Item1 == x && entry.Item2 == z)
-                {
-                    return entry.Item3;
-                }
-            }
-
-            return null;
+            return CreateBiomeMapAt(x, z);
         }
 
         private Biomes[,] CreateBiomeMapAt(int xPos, int zPos)
