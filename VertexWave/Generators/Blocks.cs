@@ -172,7 +172,7 @@ namespace VertexWave.Generators
             poppy.visible = 1;
             poppy.textureTop = 253;
             poppy.textureSide = 253;
-            poppy.renderer = flowerRenderer;
+            poppy.renderer = defRenderer;
             poppy.passable = 1;
             blocks[BlockIDs.FlowerPoppy] = poppy; 
 
@@ -195,7 +195,7 @@ namespace VertexWave.Generators
             matrixFloorSafety.visible = 1;
             matrixFloorSafety.textureTop = 4;
             matrixFloorSafety.textureSide = 4;
-            matrixFloorSafety.renderer = matrixRenderer;
+            matrixFloorSafety.renderer = defRenderer;
             blocks[BlockIDs.MatrixFloorSafety] = matrixFloorSafety;
 
             var tulip = new Block();
@@ -206,7 +206,7 @@ namespace VertexWave.Generators
             tulip.visible = 1;
             tulip.textureTop = 253;
             tulip.textureSide = 253;
-            tulip.renderer = flowerRenderer;
+            tulip.renderer = defRenderer;
             tulip.passable = 1;
             blocks[BlockIDs.FlowerTulip] = tulip;
 
@@ -218,7 +218,7 @@ namespace VertexWave.Generators
             dummy.visible = 1;
             dummy.textureTop = 0;
             dummy.textureSide = 0;
-            dummy.renderer = matrixRenderer;
+            dummy.renderer = defRenderer;
             blocks[BlockIDs.Dummy] = dummy;
 
             var blockArrowRightRenderer = new BlockArrowRight();
@@ -228,7 +228,7 @@ namespace VertexWave.Generators
             blockArrowRight.b = 0;
             blockArrowRight.id = (byte)BlockIDs.ArrowRight;
             blockArrowRight.visible = 1;
-            blockArrowRight.renderer = blockArrowRightRenderer;
+            blockArrowRight.renderer = defRenderer;
             blocks[BlockIDs.ArrowRight] = blockArrowRight;
 
             var blockArrowLeftRenderer = new BlockArrowLeft();
@@ -238,7 +238,7 @@ namespace VertexWave.Generators
             blockArrowLeft.b = 0;
             blockArrowLeft.id = (byte)BlockIDs.ArrowLeft;
             blockArrowLeft.visible = 1;
-            blockArrowLeft.renderer = blockArrowLeftRenderer;
+            blockArrowLeft.renderer = defRenderer;
             blocks[BlockIDs.ArrowLeft] = blockArrowLeft;
 
 

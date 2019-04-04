@@ -51,6 +51,9 @@ namespace VertexWave
         private BiomeGenerator _biomeGenerator;
         //private RiverGenerator _riverGenerator;
 
+        public const int MaxVertices = ChunkHeight * ChunkSize * ChunkSize * 6 * 4;
+        public const int MaxIndices = ChunkHeight * ChunkSize * ChunkSize * 6 * 4;
+
         public WorldGenerator()
         {
             seed = DateTime.Now.Millisecond - new DateTime(1970, 1, 1).Millisecond;

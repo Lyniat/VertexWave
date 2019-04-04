@@ -214,6 +214,7 @@ namespace VertexWave
 
             World.AddChunk(xPos, zPos, blocks);
 
+
             Mesh mesh = new Mesh(blocks, xPos * WorldGenerator.ChunkSize, zPos * WorldGenerator.ChunkSize);
             //mesh.Translation = new Vector3(xPos * WorldGenerator.ChunkSize, yPos, zPos * WorldGenerator.ChunkSize); TODO: change to fna
 

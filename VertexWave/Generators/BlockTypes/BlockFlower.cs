@@ -8,7 +8,7 @@ namespace Voxeland.Generators.BlockTypes
     public class BlockFlower : DefaultBlock
     {
 
-        public override void CreateBlock(List<VertexPositionColorLine> vertices, List<Color> colors, List<int> index, ref int blockNum, Vector3 pos, int nextZ, Color color, Block block)
+        public void CreateBlock(List<VertexPositionColorLine> vertices, List<Color> colors, List<int> index, ref int blockNum, Vector3 pos, int nextZ, Color color, Block block)
         {
             block.light = 255;
             int texTopPosX = block.textureTop % 16;

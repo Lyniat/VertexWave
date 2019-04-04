@@ -115,6 +115,7 @@ namespace VertexWave
 
         public override void Draw(bool alpha)
         {
+            return;
             if (!alpha)
             {
                 return;

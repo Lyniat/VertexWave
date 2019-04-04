@@ -190,8 +190,8 @@ class VoxeLand : Game, IGameState
     protected override void LoadContent()
     {
         random = new Random(DateTime.Now.Millisecond);
-        keyboard = Content.Load<Model>("keyboard");
-        logo = Content.Load<Model>("logo");
+        //keyboard = Content.Load<Model>("keyboard");
+        //logo = Content.Load<Model>("logo");
 
         basicEffect = new BasicEffect(GraphicsDevice);
 
@@ -212,11 +212,11 @@ class VoxeLand : Game, IGameState
 
         player = new Player(keyboard,new Vector3(0, WorldGenerator.PathHeight+2, 0));
 
-        logoObject = new Logo(logo, new Vector3(0, WorldGenerator.PathHeight + 20, 0));
+        //logoObject = new Logo(logo, new Vector3(0, WorldGenerator.PathHeight + 20, 0));
 
         root.Add(player);
 
-        root.Add(logoObject);
+        //root.Add(logoObject);
 
         serialController = new SerialController(player);
 

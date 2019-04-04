@@ -78,7 +78,6 @@
     <Compile Include="Generators\Struct\Struct.cs" />
     <Compile Include="Generators\Struct\Tree.cs" />
     <Compile Include="Generators\WorldGenerator.cs" />
-    <Compile Include="IMesh.cs" />
     <Compile Include="Interfaces\IBiomeGenerator.cs" />
     <Compile Include="Interfaces\IDrawable.cs" />
     <Compile Include="Interfaces\IEnviroment.cs" />
@@ -89,7 +88,6 @@
     <Compile Include="Logo.cs" />
     <Compile Include="main.cs" />
     <Compile Include="Mesh.cs" />
-    <Compile Include="MeshNotifier.cs" />
     <Compile Include="MonogameExtensions.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="OculusRift.cs" />

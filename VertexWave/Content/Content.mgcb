@@ -52,25 +52,6 @@
 #begin Fonts/Pixel_Regular_0.png
 /copy:Fonts/Pixel_Regular_0.png
 
-#begin keyboard.obj
-/importer:FbxImporter
-/processor:ModelProcessor
-/processorParam:ColorKeyColor=0,0,0,0
-/processorParam:ColorKeyEnabled=True
-/processorParam:DefaultEffect=BasicEffect
-/processorParam:GenerateMipmaps=True
-/processorParam:GenerateTangentFrames=False
-/processorParam:PremultiplyTextureAlpha=True
-/processorParam:PremultiplyVertexColors=True
-/processorParam:ResizeTexturesToPowerOfTwo=False
-/processorParam:RotationX=0
-/processorParam:RotationY=90
-/processorParam:RotationZ=180
-/processorParam:Scale=30
-/processorParam:SwapWindingOrder=False
-/processorParam:TextureFormat=Compressed
-/build:keyboard.obj
-
 #begin Keyboard_1001_AlbedoTransparency.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -82,25 +63,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Keyboard_1001_AlbedoTransparency.png
-
-#begin logo.obj
-/importer:FbxImporter
-/processor:ModelProcessor
-/processorParam:ColorKeyColor=0,0,0,0
-/processorParam:ColorKeyEnabled=True
-/processorParam:DefaultEffect=AlphaTestEffect
-/processorParam:GenerateMipmaps=True
-/processorParam:GenerateTangentFrames=False
-/processorParam:PremultiplyTextureAlpha=True
-/processorParam:PremultiplyVertexColors=True
-/processorParam:ResizeTexturesToPowerOfTwo=False
-/processorParam:RotationX=0
-/processorParam:RotationY=90
-/processorParam:RotationZ=0
-/processorParam:Scale=80
-/processorParam:SwapWindingOrder=False
-/processorParam:TextureFormat=Compressed
-/build:logo.obj
 
 #begin logo_img.png
 /importer:TextureImporter
