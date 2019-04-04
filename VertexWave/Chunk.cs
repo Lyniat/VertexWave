@@ -10,39 +10,13 @@ namespace VertexWave
     public class Chunk
     {
 
-        const bool Optimize = false;
-        // Member variables here, example:
-        // private int a = 2;
-        // private string b = "textvar";
-
         static VertexPositionColorLine[] _vertices = new VertexPositionColorLine[WorldGenerator.MaxVertices];
         static Color[] _colors = new Color[WorldGenerator.MaxVertices];
         static int[] _indices = new int[WorldGenerator.MaxIndices];
 
-        //private static SpatialMaterial material;
-
-        int blockNum = 0;
-
-        
-
-        private Vector3 position;
-
-        private int _x;
-        private int _y;
-        private int _z;
-
-        public Chunk(int x, int y, int z, Block[] blocks)
-        {
-            _x = x;
-            _y = y;
-            _z = z;
-            position = new Vector3(x, y, z);
-            //CreateFromArray(blocks);
-        }
-
         public static (VertexPositionColorLine[], int[]) CreateFromArray(Block[] blocks, int _x, int _y, int _z)
         {
-            var position = new Vector3(_x, _y, _z);
+            var position = new Vector3(_x * WorldGenerator.ChunkSize, _y, _z * WorldGenerator.ChunkSize);
             int _vertexNum = 0;
             int _indexNum = 0;
             int _colorNum = 0;
@@ -75,20 +49,5 @@ namespace VertexWave
 
             return (vertices, indices);
         }
-
-
-        public (VertexPositionColorLine[], int[]) GetData()
-        {
-            /*
-            var vertices = new VertexPositionColorLine[_vertexNum];
-            var indices = new int[_indexNum];
-            Array.Copy(_vertices,0,vertices,0,_vertexNum);
-            Array.Copy(_indices, 0, indices, 0, _indexNum);
-
-            return (vertices, indices);
-            */
-            return (null,null);
-        }
-
     }
 }
