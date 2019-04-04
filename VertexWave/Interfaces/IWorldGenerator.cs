@@ -1,5 +1,4 @@
-﻿using System;
-namespace VertexWave.Interfaces
+﻿namespace VertexWave.Interfaces
 {
     public interface IWorldGenerator
     {

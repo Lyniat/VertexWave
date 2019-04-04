@@ -1,10 +1,8 @@
-﻿using System;
-namespace VertexWave
+﻿namespace VertexWave
 {
     public interface IEnviroment
     {
-        void UpdatedLight(byte light, int id);
-
         long LastUpdate { get; }
+        void UpdatedLight(byte light, int id);
     }
 }

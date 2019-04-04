@@ -15,13 +15,13 @@
  * 
  * For method comments, refer to the base class.
  */
+
 public class SerialThread : SerialThreadLines
 {
-
     public SerialThread(string portName,
-                        int baudRate,
-                        int delayBeforeReconnecting,
-                        int maxUnreadMessages)
+        int baudRate,
+        int delayBeforeReconnecting,
+        int maxUnreadMessages)
         : base(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages)
     {
     }

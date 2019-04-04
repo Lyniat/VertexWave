@@ -4,68 +4,48 @@ namespace VertexWave
 {
     public class PlayerMovementListener : Node, IPlayerMovement
     {
-        private static List<IPlayerMovement> clients = new List<IPlayerMovement>();
-
-        public PlayerMovementListener()
-        {
-            
-        }
-
-        public void Add(IPlayerMovement p)
-        {
-            lock (clients)
-            {
-                if (!clients.Contains(p))
-                {
-                    clients.Add(p);
-                    //GD.Print("adding");
-                }
-            }
-        }
-
-        public void Remove(IPlayerMovement p)
-        {
-            lock (clients)
-            {
-                if (clients.Contains(p))
-                {
-                    clients.Remove(p);
-                }
-            }
-        }
+        private static readonly List<IPlayerMovement> Clients = new List<IPlayerMovement>();
 
         public void PlayerMovedX(float absX)
         {
             //GD.Print(absX);
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
+                foreach (var c in Clients)
                     //GD.Print(absX);
                     c.PlayerMovedX(absX);
-                }
             }
         }
 
         public void PlayerMovedY(float absY)
         {
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
-                    c.PlayerMovedY(absY);
-                }
+                foreach (var c in Clients) c.PlayerMovedY(absY);
             }
         }
 
         public void PlayerMovedZ(float absZ)
         {
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
-                    c.PlayerMovedZ(absZ);
-                }
+                foreach (var c in Clients) c.PlayerMovedZ(absZ);
+            }
+        }
+
+        public void Add(IPlayerMovement p)
+        {
+            lock (Clients)
+            {
+                if (!Clients.Contains(p)) Clients.Add(p);
+            }
+        }
+
+        public void Remove(IPlayerMovement p)
+        {
+            lock (Clients)
+            {
+                if (Clients.Contains(p)) Clients.Remove(p);
             }
         }
     }

@@ -1,58 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Voxeland.Generators.BlockTypes;
 
 namespace VertexWave
 {
     public class World
     {
-        private static List<(int, int, Block[])> chunks = new List<(int, int, Block[])>();
+        private static readonly List<(int, int, Block[])> Chunks = new List<(int, int, Block[])>();
 
-        public static Block[] GetChunkAt(int x, int z){
-            lock (chunks)
+        public static Block[] GetChunkAt(int x, int z)
+        {
+            lock (Chunks)
             {
-                foreach (var c in chunks)
-                {
+                foreach (var c in Chunks)
                     if (c.Item1 == x && c.Item2 == z)
-                    {
                         return c.Item3;
-                    }
-                }
             }
 
             return null;
         }
 
-        public static void AddChunk(int x, int z, Block[] blocks){
-            lock (chunks)
+        public static void AddChunk(int x, int z, Block[] blocks)
+        {
+            lock (Chunks)
             {
-                foreach (var c in chunks)
-                {
+                foreach (var c in Chunks)
                     if (c.Item1 == x && c.Item2 == z)
-                    {
                         return;
-                    }
-                }
 
-                chunks.Add((x, z, blocks));
+                Chunks.Add((x, z, blocks));
             }
         }
 
-        public static void RemoveChunk(int x, int z){
-            lock (chunks)
+        public static void RemoveChunk(int x, int z)
+        {
+            lock (Chunks)
             {
-                foreach (var c in chunks)
-                {
+                foreach (var c in Chunks)
                     if (c.Item1 == x && c.Item2 == z)
                     {
-                        chunks.Remove(c);
+                        Chunks.Remove(c);
                         return;
                     }
-                }
             }
         }
 
-        public static bool IsCollisionAt(float x, float y, float z){
+        public static bool IsCollisionAt(float x, float y, float z)
+        {
             /*
             var chunkX = worldX / WorldGenerator.ChunkSize;
             var chunkZ = worldZ / WorldGenerator.ChunkSize;
@@ -76,14 +69,12 @@ namespace VertexWave
             
             */
 
-            int worldX = (int) x;
-            int worldY = (int) y;
-            int worldZ = (int) z;
-                
-            
-            if(y < 0 || y >= WorldGenerator.ChunkHeight){
-                return false;
-            }
+            var worldX = (int) x;
+            var worldY = (int) y;
+            var worldZ = (int) z;
+
+
+            if (y < 0 || y >= WorldGenerator.ChunkHeight) return false;
 
             int chunkX;
             int chunkZ;
@@ -100,7 +91,7 @@ namespace VertexWave
                 chunkX = worldX / WorldGenerator.ChunkSize - 1;
                 localX = WorldGenerator.ChunkSize + worldX % WorldGenerator.ChunkSize - 1;
             }
-            
+
             if (worldZ >= 0)
             {
                 chunkZ = worldZ / WorldGenerator.ChunkSize;
@@ -109,21 +100,18 @@ namespace VertexWave
             else
             {
                 chunkZ = worldZ / WorldGenerator.ChunkSize - 1;
-                localZ = WorldGenerator.ChunkSize + worldZ % WorldGenerator.ChunkSize -1;
+                localZ = WorldGenerator.ChunkSize + worldZ % WorldGenerator.ChunkSize - 1;
             }
 
             var chunk = GetChunkAt(chunkX, chunkZ);
-            if (chunk == null)
-            {
-                return true;
-            }
-            
-            var block = chunk[localX * (WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight) + worldY * (WorldGenerator.ChunkSize) + localZ];
-            
-            if(block.id == 0){
-                return false;
-            }
-            
+            if (chunk == null) return true;
+
+            var block = chunk[
+                localX * WorldGenerator.ChunkSize * WorldGenerator.ChunkHeight + worldY * WorldGenerator.ChunkSize +
+                localZ];
+
+            if (block.id == 0) return false;
+
             return block.passable == 0;
         }
 
@@ -150,6 +138,5 @@ namespace VertexWave
             return block.light;
             */
         }
-
     }
 }

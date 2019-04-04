@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 
 namespace VertexWave
 {
     public class Node : IDrawable
     {
-        private bool loaded = false;
-        private List<Node> children = new List<Node>();
-        private List<Node> toAdd = new List<Node>();
-        
-        public bool shouldRemove { get; private set; }
+        private readonly List<Node> _children = new List<Node>();
+        private readonly List<Node> _toAdd = new List<Node>();
+        private bool _loaded;
+
         public Node()
         {
             lock (VoxeLand.nodes)
@@ -19,83 +15,73 @@ namespace VertexWave
                 VoxeLand.nodes.Add(this);
             }
         }
-        
+
+        public bool ShouldRemove { get; private set; }
+
+        public virtual void Draw(bool alpha)
+        {
+            var length = _children.Count;
+            for (var i = 0; i < length; i++)
+                lock (_children)
+                {
+                    if (i < _children.Count)
+                        _children[i].Draw(alpha);
+                    else
+                        break;
+                }
+        }
+
         public virtual void Ready()
         {
-            
         }
 
         public void Add(Node n)
         {
-            lock (toAdd)
+            lock (_toAdd)
             {
-                toAdd.Add(n);
+                _toAdd.Add(n);
             }
         }
-        
+
         public virtual void Destroy()
         {
-            lock (children)
+            lock (_children)
             {
-                foreach (var c in children)
-                {
-                    c.Destroy();
-                }
+                foreach (var c in _children) c.Destroy();
             }
 
-            shouldRemove = true;
-
-        }
-
-        public virtual void Draw(bool alpha)
-        {
-            var length = children.Count;
-            for (var i = 0; i < length; i++){
-                lock (children)
-                {
-                    if (i < children.Count)
-                    {
-                        children[i].Draw(alpha);
-                    }else{
-                        break;
-                    }
-                }
-            }
+            ShouldRemove = true;
         }
 
         public virtual void Update(float deltaTime)
         {
-            if (!loaded)
+            if (!_loaded)
             {
                 Ready();
-                loaded = true;
+                _loaded = true;
             }
-            lock (children)
-            {
-                foreach (var c in children)
-                {
-                    c.Update(deltaTime);
-                }
 
-                lock (toAdd)
+            lock (_children)
+            {
+                foreach (var c in _children) c.Update(deltaTime);
+
+                lock (_toAdd)
                 {
-                    children.AddRange(toAdd);
-                    toAdd.Clear();
+                    _children.AddRange(_toAdd);
+                    _toAdd.Clear();
                 }
 
                 var again = true;
                 while (again)
                 {
                     again = false;
-                    foreach (var c in children)
-                    {
-                        if (c.shouldRemove)
+                    foreach (var c in _children)
+                        if (c.ShouldRemove)
                         {
-                            children.Remove(c);
+                            _children.Remove(c);
                             again = true;
                             break;
                         }
-                    }
                 }
             }
         }

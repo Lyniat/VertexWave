@@ -5,17 +5,11 @@ using Microsoft.Xna.Framework.Graphics;
 namespace TrueCraft.Client.Rendering
 {
     /// <summary>
-    /// Represents a font renderer.
+    ///     Represents a font renderer.
     /// </summary>
     public class FontRenderer
     {
         /// <summary>
-        /// 
-        /// </summary>
-        public Font[] Fonts { get; private set; }
-
-        /// <summary>
-        /// 
         /// </summary>
         /// <param name="font"></param>
         public FontRenderer(Font font)
@@ -23,14 +17,13 @@ namespace TrueCraft.Client.Rendering
             if (font == null)
                 throw new ArgumentNullException("font");
 
-            Fonts = new Font[]
+            Fonts = new[]
             {
                 font
             };
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="regular"></param>
         /// <param name="bold"></param>
@@ -42,7 +35,7 @@ namespace TrueCraft.Client.Rendering
             if (regular == null)
                 throw new ArgumentNullException("regular");
 
-            Fonts = new Font[]
+            Fonts = new[]
             {
                 regular,
                 bold ?? regular,
@@ -52,31 +45,34 @@ namespace TrueCraft.Client.Rendering
             };
         }
 
+        /// <summary>
+        /// </summary>
+        public Font[] Fonts { get; }
+
         public Point MeasureText(string text, float scale = 1.0f)
         {
             var dx = 0;
             var height = 0;
             var font = Fonts[0];
-            for (int i = 0; i < text.Length; i++)
-            {
+            for (var i = 0; i < text.Length; i++)
                 if (text[i] == '§')
                 {
                     i++;
                     var code = string.Format("§{0}", text[i]);
                     //if (ChatFormat.IsValid(code))
-                        font = GetFont(code);
+                    font = GetFont(code);
                 }
                 else
                 {
                     var glyph = font.GetGlyph(text[i]);
                     if (glyph != null)
                     {
-                        dx += (int)(glyph.XAdvance * scale);
+                        dx += (int) (glyph.XAdvance * scale);
                         if (glyph.Height > height)
                             height = glyph.Height;
                     }
                 }
-            }
+
             return new Point(dx, height);
         }
 
@@ -87,16 +83,15 @@ namespace TrueCraft.Client.Rendering
             var color = Color.White;
             var font = Fonts[0];
 
-            for (int i = 0; i < text.Length; i++)
-            {
+            for (var i = 0; i < text.Length; i++)
                 if (text[i] == '§')
                 {
                     i++;
                     var code = string.Format("§{0}", text[i]);
                     //if (ChatFormat.IsValid(code))
-                        font = GetFont(code);
+                    font = GetFont(code);
                     //else
-                        //color = GetColor(code);
+                    //color = GetColor(code);
                 }
                 else
                 {
@@ -105,22 +100,23 @@ namespace TrueCraft.Client.Rendering
                     {
                         var sourceRectangle = new Rectangle(glyph.X, glyph.Y, glyph.Width, glyph.Height);
                         var destRectangle = new Rectangle(
-                            dx + (int)(glyph.XOffset * scale),
-                            dy + (int)(glyph.YOffset * scale),
-                            (int)(glyph.Width * scale),
-                            (int)(glyph.Height * scale));
+                            dx + (int) (glyph.XOffset * scale),
+                            dy + (int) (glyph.YOffset * scale),
+                            (int) (glyph.Width * scale),
+                            (int) (glyph.Height * scale));
                         var shadowRectangle = new Rectangle(
-                            dx + (int)(glyph.XOffset * scale) + 4,
-                            dy + (int)(glyph.YOffset * scale) + 4,
-                            (int)(glyph.Width * scale),
-                            (int)(glyph.Height * scale));
+                            dx + (int) (glyph.XOffset * scale) + 4,
+                            dy + (int) (glyph.YOffset * scale) + 4,
+                            (int) (glyph.Width * scale),
+                            (int) (glyph.Height * scale));
 
-                        spriteBatch.Draw(font.GetTexture(glyph.Page), shadowRectangle, sourceRectangle, new Color((byte)21, (byte)21, (byte)21, alpha));
-                        spriteBatch.Draw(font.GetTexture(glyph.Page), destRectangle, sourceRectangle, new Color(color, alpha));
-                        dx += (int)(glyph.XAdvance * scale);
+                        spriteBatch.Draw(font.GetTexture(glyph.Page), shadowRectangle, sourceRectangle,
+                            new Color((byte) 21, (byte) 21, (byte) 21, alpha));
+                        spriteBatch.Draw(font.GetTexture(glyph.Page), destRectangle, sourceRectangle,
+                            new Color(color, alpha));
+                        dx += (int) (glyph.XAdvance * scale);
                     }
                 }
-            }
         }
 
         private Font GetFont(string formatCode)

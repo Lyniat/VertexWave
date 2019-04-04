@@ -1,45 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace VertexWave
 {
     public class EnviromentListener
     {
-        private static List<IEnviroment> clients = new List<IEnviroment>();
+        private static readonly List<IEnviroment> Clients = new List<IEnviroment>();
 
         public void Add(IEnviroment e)
         {
-            lock (clients)
+            lock (Clients)
             {
-                if (!clients.Contains(e))
-                {
-                    clients.Add(e);
-                }
+                if (!Clients.Contains(e)) Clients.Add(e);
             }
         }
 
         public void Remove(IEnviroment e)
         {
-            lock (clients)
+            lock (Clients)
             {
-                if (clients.Contains(e))
-                {
-                    clients.Remove(e);
-                }
+                if (Clients.Contains(e)) Clients.Remove(e);
             }
         }
 
         public void UpdatedLight(byte light, int id)
         {
             //GD.Print(absX);
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
-                    c.UpdatedLight(light , id);
-                }
+                foreach (var c in Clients) c.UpdatedLight(light, id);
             }
         }
-
     }
 }

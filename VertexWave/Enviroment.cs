@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Xna.Framework;
 
@@ -7,21 +6,7 @@ namespace VertexWave
 {
     public class Enviroment
     {
-        public static byte Light { get; private set; }
         public const byte MaxLight = 128;
-        private static EnviromentListener listener = new EnviromentListener();
-
-        public static int TimeOfDay { get; private set; }
-
-        public static double CelestialAngle { get; private set; }
-
-        public static double Brigthness { get; private set; }
-
-        public static Color SkyColor {get; private set;}
-
-        public static int Minutes {get; private set;}
-
-        public static int Hours { get; private set; }
 
 
         static Enviroment()
@@ -30,6 +15,20 @@ namespace VertexWave
             UpdateEnviroment();
             TimeOfDay = 18000;
         }
+
+        public static byte Light { get; private set; }
+
+        public static int TimeOfDay { get; private set; }
+
+        public static double CelestialAngle { get; private set; }
+
+        public static double Brigthness { get; private set; }
+
+        public static Color SkyColor { get; private set; }
+
+        public static int Minutes { get; private set; }
+
+        public static int Hours { get; private set; }
 
         private static void UpdateEnviroment()
         {
@@ -42,24 +41,16 @@ namespace VertexWave
                     //listener.UpdatedLight(Light, 0);
                     TimeOfDay++;
 
-                    if (TimeOfDay > 24000)
-                    {
-                        TimeOfDay = 0;
-                    }
+                    if (TimeOfDay > 24000) TimeOfDay = 0;
 
                     CalculateAngle();
                     CalculateBrigtness();
                     CalculateSkyColor();
                     CalculateTime();
 
-                    if(counter > 2){
-                        //listener.UpdatedLight(Light, 0);
-                        counter = 0;
-                    }
+                    if (counter > 2) counter = 0;
 
                     return;
-
-                    counter++;
                 }
             }).Start();
         }
@@ -67,44 +58,39 @@ namespace VertexWave
         private static void CalculateAngle()
         {
             var x = TimeOfDay / 24000.0;
-            if (x <= 0)
-            {
-                x += 1;
-            }
-            CelestialAngle = x + ((1.0 - (Math.Cos(x * Math.PI) + 1.0) / 2.0) - x) / 3.0;
+            if (x <= 0) x += 1;
+            CelestialAngle = x + (1.0 - (Math.Cos(x * Math.PI) + 1.0) / 2.0 - x) / 3.0;
         }
 
         private static void CalculateBrigtness()
         {
-            Brigthness = Math.Cos(CelestialAngle * 2 * Math.PI -4) * 1.5 + 0.8;
-            if(Brigthness < 0){
+            Brigthness = Math.Cos(CelestialAngle * 2 * Math.PI - 4) * 1.5 + 0.8;
+            if (Brigthness < 0)
                 Brigthness = 0;
-            }
-            else if (Brigthness > 1){
-                Brigthness = 1;
-            }
+            else if (Brigthness > 1) Brigthness = 1;
 
-            Light = (byte)(MaxLight * Brigthness);
+            Light = (byte) (MaxLight * Brigthness);
         }
 
-        private static void CalculateSkyColor(){
+        private static void CalculateSkyColor()
+        {
             float h = 214;
-            float s = 0.5f;
-            float v = (float)Brigthness;
-            SkyColor = HSVToRGB(h, s, v);
+            var s = 0.5f;
+            var v = (float) Brigthness;
+            SkyColor = HsvtoRgb(h, s, v);
 
             //SkyColor = new Color((float)Brigthness,(float)Brigthness,(float)Brigthness);
         }
 
-        private static void CalculateTime(){
+        private static void CalculateTime()
+        {
             Hours = TimeOfDay / 1000;
-            int min = TimeOfDay % 1000;
-            Minutes = (int)((min / 1000f) * 60f);
+            var min = TimeOfDay % 1000;
+            Minutes = (int) (min / 1000f * 60f);
         }
 
-        private static Color HSVToRGB(float h, float s, float v)
+        private static Color HsvtoRgb(float h, float s, float v)
         {
-
             float r, g, b;
 
             if (s == 0)
@@ -123,12 +109,12 @@ namespace VertexWave
                 else
                     h = h / 60f;
 
-                i = (int)Math.Truncate(h);
+                i = (int) Math.Truncate(h);
                 f = h - i;
 
                 p = v * (1.0f - s);
-                q = v * (1.0f - (s * f));
-                t = v * (1.0f - (s * (1.0f - f)));
+                q = v * (1.0f - s * f);
+                t = v * (1.0f - s * (1.0f - f));
 
                 switch (i)
                 {
@@ -168,7 +154,6 @@ namespace VertexWave
                         b = q;
                         break;
                 }
-
             }
 
             return new Color(r, g, b);

@@ -5,64 +5,53 @@ namespace VertexWave
 {
     public class Entity : Node
     {
-        public virtual bool Static { get => false; }
-        public Vector3 position;
-        const int CameraHeight = 2;
+        private const int CameraHeight = 2;
+
+        private bool _wasOnGroundAgain = true;
 
         public float currentGravivty = -0.3f;
-        public Vector2 lastPosition = new Vector2();
+        public Vector2 lastPosition;
+        public Vector3 position;
 
-        bool wasOnGroundAgain = true;
+        public virtual bool Static => false;
 
-        protected virtual Vector3[] BoundingBox => new Vector3[]{new Vector3(0,0,0)};
-
-        public Entity()
-        {
-            
-        }
+        protected virtual Vector3[] BoundingBox => new[] {new Vector3(0, 0, 0)};
 
         public override void Update(float deltaTime)
         {
-            if (Static)
-            {
-                return;
-            }
+            if (Static) return;
             currentGravivty -= 0.01f;
-            if(currentGravivty < -0.3f){
-                currentGravivty = -0.3f;
-            }
+            if (currentGravivty < -0.3f) currentGravivty = -0.3f;
             //System.Console.WriteLine("delat " + deltaTime);
             var oldY = position.Y;
             position.Y = position.Y + currentGravivty;
 
             var collided = false;
             foreach (var b in BoundingBox)
-            {
                 if (World.IsCollisionAt(position.X + b.X, position.Y + b.Y, position.Z + b.Z))
                 {
                     collided = true;
                     break;
                 }
-            }
 
             if (collided)
             {
-                position.Y = (float)Math.Ceiling(position.Y);
-                wasOnGroundAgain = true;
+                position.Y = (float) Math.Ceiling(position.Y);
+                _wasOnGroundAgain = true;
             }
         }
 
 
-        public void Jump(float newGravity){
-            if(!wasOnGroundAgain){
-                return;
-            }
-            wasOnGroundAgain = false;
+        public void Jump(float newGravity)
+        {
+            if (!_wasOnGroundAgain) return;
+            _wasOnGroundAgain = false;
 
             currentGravivty = newGravity;
         }
 
-        public bool Move(Vector3 direction){
+        public bool Move(Vector3 direction)
+        {
             position.X = position.X + direction.X;
             position.Z = position.Z + direction.Z;
 
@@ -70,13 +59,11 @@ namespace VertexWave
 
 
             foreach (var b in BoundingBox)
-            {
                 if (World.IsCollisionAt(position.X + b.X, position.Y + b.Y, position.Z + b.Z))
                 {
                     collided = true;
                     break;
                 }
-            }
 
             return true;
 

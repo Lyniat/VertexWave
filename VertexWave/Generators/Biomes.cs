@@ -1,5 +1,4 @@
-﻿using System;
-namespace VertexWave
+﻿namespace VertexWave
 {
     public enum Biomes
     {

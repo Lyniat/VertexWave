@@ -6,11 +6,8 @@
  * https://creativecommons.org/licenses/by/2.0/
  */
 
-using VertexWave.BoardController;
-using System;
-using System.IO.Ports;
 using System.Threading;
-using Voxeland;
+using VertexWave.BoardController;
 
 /**
  * This class allows a Unity program to continually check for messages from a
@@ -28,27 +25,33 @@ using Voxeland;
  */
 public class SerialController
 {
-    public string portName = "COM16";
-
-    public int baudRate = 1000000;
-
-    private IMessageListener _messageListener;
-
-    public int reconnectionDelay = 1;
-
-    public int maxUnreadMessages = 20;
+    // ------------------------------------------------------------------------
+    // Executes a user-defined function before Unity closes the COM port, so
+    // the user can send some tear-down message to the hardware reliably.
+    // ------------------------------------------------------------------------
+    public delegate void TearDownFunction();
 
     // Constants used to mark the start and end of a connection. There is no
     // way you can generate clashing messages from your serial device, as I
     // compare the references of these strings, no their contents. So if you
     // send these same strings from the serial device, upon reconstruction they
     // will have different reference ids.
-    public const string SERIAL_DEVICE_CONNECTED = "__Connected__";
-    public const string SERIAL_DEVICE_DISCONNECTED = "__Disconnected__";
+    public const string SerialDeviceConnected = "__Connected__";
+    public const string SerialDeviceDisconnected = "__Disconnected__";
+
+    private readonly IMessageListener _messageListener;
+    private TearDownFunction _userDefinedTearDownFunction;
+
+    public int baudRate = 1000000;
+
+    public int maxUnreadMessages = 20;
+    public string portName = "COM16";
+
+    public int reconnectionDelay = 1;
+    protected SerialThreadLines serialThread;
 
     // Internal reference to the Thread and the object that runs in it.
     protected Thread thread;
-    protected SerialThreadLines serialThread;
 
 
     // ------------------------------------------------------------------------
@@ -56,15 +59,15 @@ public class SerialController
     // It creates a new thread that tries to connect to the serial device
     // and start reading from it.
     // ------------------------------------------------------------------------
-    public SerialController (IMessageListener messageListener)
+    public SerialController(IMessageListener messageListener)
     {
         _messageListener = messageListener;
-        
-        serialThread = new SerialThreadLines(portName, 
-                                             baudRate, 
-                                             reconnectionDelay,
-                                             maxUnreadMessages);
-        thread = new Thread(new ThreadStart(serialThread.RunForever));
+
+        serialThread = new SerialThreadLines(portName,
+            baudRate,
+            reconnectionDelay,
+            maxUnreadMessages);
+        thread = new Thread(serialThread.RunForever);
         thread.Start();
     }
 
@@ -72,12 +75,12 @@ public class SerialController
     // Invoked whenever the SerialController gameobject is deactivated.
     // It stops and destroys the thread that was reading from the serial device.
     // ------------------------------------------------------------------------
-    void OnDisable()
+    private void OnDisable()
     {
         // If there is a user-defined tear-down function, execute it before
         // closing the underlying COM port.
-        if (userDefinedTearDownFunction != null)
-            userDefinedTearDownFunction();
+        if (_userDefinedTearDownFunction != null)
+            _userDefinedTearDownFunction();
 
         // The serialThread reference should never be null at this point,
         // unless an Exception happened in the OnEnable(), in which case I've
@@ -111,29 +114,20 @@ public class SerialController
 
         // If the user prefers to poll the messages instead of receiving them
         // via SendMessage, then the message listener should be null.
-        if (_messageListener == null)
-        {
-            return;
-        }
+        if (_messageListener == null) return;
 
 
         // Read the next message from the queue
-        string message = (string)serialThread.ReadMessage();
-        if (message == null)
-        {
-            return;
-        }
+        var message = (string) serialThread.ReadMessage();
+        if (message == null) return;
         // Check if the message is plain data or a connect/disconnect event.
-        
-        if (ReferenceEquals(message, SERIAL_DEVICE_CONNECTED))
+
+        if (ReferenceEquals(message, SerialDeviceConnected))
             _messageListener.OnConnectionEvent(true);
-        else if (ReferenceEquals(message, SERIAL_DEVICE_DISCONNECTED))
+        else if (ReferenceEquals(message, SerialDeviceDisconnected))
             _messageListener.OnConnectionEvent(false);
         else
-        {
             _messageListener.OnMessageArrived(message);
-        }   
-
     }
 
     // ------------------------------------------------------------------------
@@ -143,7 +137,7 @@ public class SerialController
     public string ReadSerialMessage()
     {
         // Read the next message from the queue
-        return (string)serialThread.ReadMessage();
+        return (string) serialThread.ReadMessage();
     }
 
     // ------------------------------------------------------------------------
@@ -155,15 +149,8 @@ public class SerialController
         serialThread.SendMessage(message);
     }
 
-    // ------------------------------------------------------------------------
-    // Executes a user-defined function before Unity closes the COM port, so
-    // the user can send some tear-down message to the hardware reliably.
-    // ------------------------------------------------------------------------
-    public delegate void TearDownFunction();
-    private TearDownFunction userDefinedTearDownFunction;
     public void SetTearDownFunction(TearDownFunction userFunction)
     {
-        this.userDefinedTearDownFunction = userFunction;
+        _userDefinedTearDownFunction = userFunction;
     }
-
 }

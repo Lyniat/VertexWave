@@ -8,9 +8,9 @@
 
 
 using System;
+using System.Collections;
 using System.IO;
 using System.IO.Ports;
-using System.Collections;
 using System.Threading;
 
 /**
@@ -22,35 +22,37 @@ using System.Threading;
  */
 public abstract class AbstractSerialThread
 {
-    // Parameters passed from SerialController, used for connecting to the
-    // serial device as explained in the SerialController documentation.
-    private string _portName;
-    private int _baudRate;
-    private int _delayBeforeReconnecting;
-    private int _maxUnreadMessages;
-
-    // Object from the .Net framework used to communicate with serial devices.
-    private SerialPort serialPort;
-
     // Amount of milliseconds alloted to a single read or connect. An
     // exception is thrown when such operations take more than this time
     // to complete.
-    private const int readTimeout = 100;
+    private const int ReadTimeout = 100;
 
     // Amount of milliseconds alloted to a single write. An exception is thrown
     // when such operations take more than this time to complete.
-    private const int writeTimeout = 100;
+    private const int WriteTimeout = 100;
+    private readonly int _baudRate;
+    private readonly int _delayBeforeReconnecting;
+
+    private readonly bool _enqueueStatusMessages;
 
     // Internal synchronized queues used to send and receive messages from the
     // serial device. They serve as the point of communication between the
     // Unity thread and the Ardity thread.
-    private Queue inputQueue, outputQueue;
+    private readonly Queue _inputQueue;
+
+    private readonly int _maxUnreadMessages;
+    private readonly Queue _outputQueue;
+
+    // Parameters passed from SerialController, used for connecting to the
+    // serial device as explained in the SerialController documentation.
+    private readonly string _portName;
+
+    // Object from the .Net framework used to communicate with serial devices.
+    private SerialPort _serialPort;
 
     // Indicates when this thread should stop executing. When SerialController
     // invokes 'RequestStop()' this variable is set.
-    private bool stopRequested = false;
-
-    private bool _enqueueStatusMessages = false;
+    private bool _stopRequested;
 
 
     /**************************************************************************
@@ -62,10 +64,10 @@ public abstract class AbstractSerialThread
     // its method 'RunForever' can later be used to create a real Thread.
     // ------------------------------------------------------------------------
     public AbstractSerialThread(string portName,
-                                int baudRate,
-                                int delayBeforeReconnecting,
-                                int maxUnreadMessages,
-                                bool enqueueStatusMessages)
+        int baudRate,
+        int delayBeforeReconnecting,
+        int maxUnreadMessages,
+        bool enqueueStatusMessages)
     {
         _portName = portName;
         _baudRate = baudRate;
@@ -73,8 +75,8 @@ public abstract class AbstractSerialThread
         _maxUnreadMessages = maxUnreadMessages;
         _enqueueStatusMessages = enqueueStatusMessages;
 
-        inputQueue = Queue.Synchronized(new Queue());
-        outputQueue = Queue.Synchronized(new Queue());
+        _inputQueue = Queue.Synchronized(new Queue());
+        _outputQueue = Queue.Synchronized(new Queue());
     }
 
     // ------------------------------------------------------------------------
@@ -84,7 +86,7 @@ public abstract class AbstractSerialThread
     {
         lock (this)
         {
-            stopRequested = true;
+            _stopRequested = true;
         }
     }
 
@@ -96,10 +98,10 @@ public abstract class AbstractSerialThread
     // ------------------------------------------------------------------------
     public object ReadMessage()
     {
-        if (inputQueue.Count == 0)
+        if (_inputQueue.Count == 0)
             return null;
 
-        return inputQueue.Dequeue();
+        return _inputQueue.Dequeue();
     }
 
     // ------------------------------------------------------------------------
@@ -109,7 +111,7 @@ public abstract class AbstractSerialThread
     // ------------------------------------------------------------------------
     public void SendMessage(object message)
     {
-        outputQueue.Enqueue(message);
+        _outputQueue.Enqueue(message);
     }
 
 
@@ -130,7 +132,6 @@ public abstract class AbstractSerialThread
         try
         {
             while (!IsStopRequested())
-            {
                 try
                 {
                     AttemptConnection();
@@ -147,7 +148,7 @@ public abstract class AbstractSerialThread
                     // to the console and notify the listener.
                     Console.WriteLine("Exception: " + ioe.Message + " StackTrace: " + ioe.StackTrace);
                     if (_enqueueStatusMessages)
-                        inputQueue.Enqueue(SerialController.SERIAL_DEVICE_DISCONNECTED);
+                        _inputQueue.Enqueue(SerialController.SerialDeviceDisconnected);
 
                     // As I don't know in which stage the SerialPort threw the
                     // exception I call this method that is very safe in
@@ -160,14 +161,10 @@ public abstract class AbstractSerialThread
                     // throughput.
                     Thread.Sleep(_delayBeforeReconnecting);
                 }
-            }
 
             // Before closing the COM port, give the opportunity for all messages
             // from the output queue to reach the other endpoint.
-            while (outputQueue.Count != 0)
-            {
-                SendToWire(outputQueue.Dequeue(), serialPort);
-            }
+            while (_outputQueue.Count != 0) SendToWire(_outputQueue.Dequeue(), _serialPort);
 
             // Attempt to do a final cleanup. This method doesn't fail even if
             // the port is in an invalid status.
@@ -184,14 +181,14 @@ public abstract class AbstractSerialThread
     // ------------------------------------------------------------------------
     private void AttemptConnection()
     {
-        serialPort = new SerialPort(_portName, _baudRate);
-        serialPort.ReadTimeout = readTimeout;
-        serialPort.WriteTimeout = writeTimeout;
-        serialPort.RtsEnable = true;
-        serialPort.Open();
+        _serialPort = new SerialPort(_portName, _baudRate);
+        _serialPort.ReadTimeout = ReadTimeout;
+        _serialPort.WriteTimeout = WriteTimeout;
+        _serialPort.RtsEnable = true;
+        _serialPort.Open();
 
         if (_enqueueStatusMessages)
-            inputQueue.Enqueue(SerialController.SERIAL_DEVICE_CONNECTED);
+            _inputQueue.Enqueue(SerialController.SerialDeviceConnected);
     }
 
     // ------------------------------------------------------------------------
@@ -199,19 +196,19 @@ public abstract class AbstractSerialThread
     // ------------------------------------------------------------------------
     private void CloseDevice()
     {
-        if (serialPort == null)
+        if (_serialPort == null)
             return;
 
         try
         {
-            serialPort.Close();
+            _serialPort.Close();
         }
         catch (IOException)
         {
             // Nothing to do, not a big deal, don't try to cleanup any further.
         }
 
-        serialPort = null;
+        _serialPort = null;
     }
 
     // ------------------------------------------------------------------------
@@ -221,7 +218,7 @@ public abstract class AbstractSerialThread
     {
         lock (this)
         {
-            return stopRequested;
+            return _stopRequested;
         }
     }
 
@@ -237,26 +234,19 @@ public abstract class AbstractSerialThread
         try
         {
             // Send a message.
-            if (outputQueue.Count != 0)
-            {
-                SendToWire(outputQueue.Dequeue(), serialPort);
-            }
+            if (_outputQueue.Count != 0) SendToWire(_outputQueue.Dequeue(), _serialPort);
 
             // Read a message.
             // If a line was read, and we have not filled our queue, enqueue
             // this line so it eventually reaches the Message Listener.
             // Otherwise, discard the line.
-            object inputMessage = ReadFromWire(serialPort);
+            var inputMessage = ReadFromWire(_serialPort);
             if (inputMessage != null)
             {
-                if (inputQueue.Count < _maxUnreadMessages)
-                {
-                    inputQueue.Enqueue(inputMessage);
-                }
+                if (_inputQueue.Count < _maxUnreadMessages)
+                    _inputQueue.Enqueue(inputMessage);
                 else
-                {
                     Console.WriteLine("Queue is full. Dropping message: " + inputMessage);
-                }
             }
         }
         catch (TimeoutException)

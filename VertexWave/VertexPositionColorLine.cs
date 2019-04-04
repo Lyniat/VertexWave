@@ -1,78 +1,68 @@
 #region License
+
 /* FNA - XNA4 Reimplementation for Desktop Platforms
  * Copyright 2009-2018 Ethan Lee and the MonoGame Team
  *
  * Released under the Microsoft Public License.
  * See LICENSE for details.
  */
+
 #endregion
 
 #region Using Statements
+
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 #endregion
 
 namespace VertexWave
 {
-	[Serializable]
-	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	public struct VertexPositionColorLine : IVertexType
-	{
-		#region Private Properties
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct VertexPositionColorLine : IVertexType
+    {
+        #region Private Properties
 
-		VertexDeclaration IVertexType.VertexDeclaration
-		{
-			get
-			{
-				return VertexDeclaration;
-			}
-		}
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
-		#endregion
+        #endregion
 
-		#region Public Variables
+        #region Public Variables
 
-		public Vector3 Position;
-		public Color Color;
+        public Vector3 Position;
+        public Color Color;
 
-		#endregion
+        #endregion
 
-		#region Public Static Variables
+        #region Public Static Variables
 
-		public static readonly VertexDeclaration VertexDeclaration;
+        public static readonly VertexDeclaration VertexDeclaration;
 
-		#endregion
+        #endregion
 
-		#region Private Static Constructor
+        #region Private Static Constructor
 
-		static VertexPositionColorLine()
-		{
-			VertexDeclaration = new VertexDeclaration(
-				new VertexElement[]
-				{
-						new VertexElement(
-							0,
-							VertexElementFormat.Vector3,
-							VertexElementUsage.Position,
-							0
-						),
-						new VertexElement(
-							12,
-							VertexElementFormat.Color,
-							VertexElementUsage.Color,
-							0
-						)
-				}
-			);
-		}
+        static VertexPositionColorLine()
+        {
+            VertexDeclaration = new VertexDeclaration(new VertexElement(
+                0,
+                VertexElementFormat.Vector3,
+                VertexElementUsage.Position,
+                0
+            ), new VertexElement(
+                12,
+                VertexElementFormat.Color,
+                VertexElementUsage.Color,
+                0
+            ));
+        }
 
-		#endregion
+        #endregion
 
-		#region Public Constructor
+        #region Public Constructor
 
         public VertexPositionColorLine(
             Vector3 position,
@@ -88,46 +78,38 @@ namespace VertexWave
         #region Public Static Operators and Override Methods
 
         public override int GetHashCode()
-		{
-			// TODO: Fix GetHashCode
-			return 0;
-		}
+        {
+            // TODO: Fix GetHashCode
+            return 0;
+        }
 
-		public override string ToString()
-		{
-			return (
-				"{{Position:" + Position.ToString() +
-				" Color:" + Color.ToString()+
-				"}}"
-			);
-		}
+        public override string ToString()
+        {
+            return "{{Position:" + Position +
+                   " Color:" + Color +
+                   "}}";
+        }
 
-		public static bool operator ==(VertexPositionColorLine left, VertexPositionColorLine right)
-		{
-			return (	(left.Position == right.Position) &&
-					(left.Color == right.Color));
-		}
+        public static bool operator ==(VertexPositionColorLine left, VertexPositionColorLine right)
+        {
+            return left.Position == right.Position &&
+                   left.Color == right.Color;
+        }
 
-		public static bool operator !=(VertexPositionColorLine left, VertexPositionColorLine right)
-		{
-			return !(left == right);
-		}
+        public static bool operator !=(VertexPositionColorLine left, VertexPositionColorLine right)
+        {
+            return !(left == right);
+        }
 
-		public override bool Equals(object obj)
-		{
-			if (obj == null)
-			{
-				return false;
-			}
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
 
-			if (obj.GetType() != base.GetType())
-			{
-				return false;
-			}
+            if (obj.GetType() != GetType()) return false;
 
-			return (this == ((VertexPositionColorLine) obj));
-		}
+            return this == (VertexPositionColorLine) obj;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

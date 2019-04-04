@@ -1,73 +1,155 @@
 ﻿using System;
-using VertexWave.BoardController;
-using VertexWave.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using VertexWave.BoardController;
+using VertexWave.Interfaces;
+
 namespace VertexWave
 {
-	public class Player : Entity, IMessageListener, IGameState
+    public class Player : Entity, IMessageListener, IGameState
     {
-        Entity mCamera;
+        private const float ControllerSensitivity = 1.75f;
+        private readonly GameStateListener _gameStateListener;
+
+        private readonly PlayerMovementListener _playerMovementListener;
 
 
-        float _rotation;
-        float _scale;
-        Model _model;
+        private byte _b0;
+        private byte _b1;
 
-        float directionX;
-        float directionZ;
+        private Vector3 _boardDirection = Vector3.Zero;
 
-        float light = 0;
+        private float _directionX;
+        private float _directionZ;
+        private float _drift;
 
-        int isMoving = 0;
+        private int _isMoving;
 
-        public float Rotation { get => _rotation; }
-        public float Scale { get => _scale; }
-        public Model Model { get => _model; }
+        private int _iteration;
 
-        PlayerMovementListener playerMovementListener;
-        GameStateListener gameStateListener;
+        private float _light = 0;
+        private Entity _mCamera;
 
-        int iteration = 0;
-        byte b_0 = 0;
-        byte b_1 = 0;
-
-        bool started = false;
-        float drift = 0;
-
-        const float ControllerSensitivity = 1.75f;
-
-        Vector3 boardDirection = Vector3.Zero;
-
-        protected override Vector3[] BoundingBox => new Vector3[]
-        {
-            new Vector3(-0.5f,0,-0.5f),
-            new Vector3(-0.5f,0,0.5f),
-            new Vector3(0.5f,0,-0.5f),
-            new Vector3(0.5f,0,0.5f)
-        };
+        private bool _started;
 
         public Player(Model model, Vector3 pos)
         {
-			position = pos;
-            _model = model;
-            _scale = 1 / 24f;
-            _rotation = 0;
+            position = pos;
+            Model = model;
+            Scale = 1 / 24f;
+            Rotation = 0;
 
-            playerMovementListener = new PlayerMovementListener();
-            playerMovementListener.Add(this);
+            _playerMovementListener = new PlayerMovementListener();
+            _playerMovementListener.Add(this);
 
-            gameStateListener = new GameStateListener();
-            gameStateListener.Add(this);
-
+            _gameStateListener = new GameStateListener();
+            _gameStateListener.Add(this);
         }
 
-        public void SetCamera(Entity camera){
-            mCamera = camera;
+        public float Rotation { get; }
+        public float Scale { get; }
+        public Model Model { get; }
+
+        protected override Vector3[] BoundingBox => new[]
+        {
+            new Vector3(-0.5f, 0, -0.5f),
+            new Vector3(-0.5f, 0, 0.5f),
+            new Vector3(0.5f, 0, -0.5f),
+            new Vector3(0.5f, 0, 0.5f)
+        };
+
+        public void LostGame()
+        {
+            _isMoving = 0;
         }
 
-		public override void Update(float deltaTime)
+        public void StartedGame()
+        {
+            _isMoving = 1;
+        }
+
+        public void LoadedGame()
+        {
+        }
+
+        public void OnConnectionEvent(bool status)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void OnMessageArrived(string message)
+        {
+            try
+            {
+                byte value;
+                Console.WriteLine("arrived");
+                try
+                {
+                    value = byte.Parse(message);
+                }
+                catch (OverflowException)
+                {
+                    //might occur sometimes if serial had problems reading
+                    return;
+                }
+
+                if (_iteration == 0) // first byte must be 255
+                {
+                    if (value == 255)
+                    {
+                        _iteration = 1;
+                        _b0 = 0;
+                        _b1 = 0;
+                    }
+
+                    return;
+                }
+
+                if (_iteration == 1 || _iteration == 2) // 1 byte
+                {
+                    _b0 = (byte) (_b0 | value);
+                    _iteration++;
+                    return;
+                }
+
+                if (_iteration == 3 || _iteration == 4) // 2 byte
+                {
+                    _b1 = (byte) (_b1 | value);
+                    _iteration++;
+
+                    if (_iteration == 5)
+                        _iteration = 0;
+                    else
+                        return;
+                }
+
+
+                byte[] bytes = {_b1, _b0};
+
+                var axis = BitConverter.ToInt16(bytes, 0) / 100f;
+
+                if (!_started)
+                {
+                    _drift = axis;
+                    _started = true;
+                }
+
+                axis -= _drift;
+
+                _boardDirection = new Vector3(axis, 0, 0);
+            }
+            catch (FormatException)
+            {
+                //might occur sometimes if serial had problems reading
+            }
+        }
+
+        public void SetCamera(Entity camera)
+        {
+            _mCamera = camera;
+        }
+
+        public override void Update(float deltaTime)
         {
             /*
             var speed = 0.01f;
@@ -97,36 +179,29 @@ namespace VertexWave
     */
 
             var direction = new Vector3(0, 0, -1);
-            direction += boardDirection/ -15f;
+            direction += _boardDirection / -15f;
             var speed = 0.018f;
             var speedVector = new Vector3(speed * ControllerSensitivity, 0, speed);
-            Move(direction * speedVector * deltaTime * isMoving);
-            playerMovementListener.PlayerMovedX(position.X);
-            playerMovementListener.PlayerMovedZ(position.Z);
+            Move(direction * speedVector * deltaTime * _isMoving);
+            _playerMovementListener.PlayerMovedX(position.X);
+            _playerMovementListener.PlayerMovedZ(position.Z);
 
-            if(position.Y < WorldGenerator.PathHeight)
-            {
-                gameStateListener.LostGame();
-            }
+            if (position.Y < WorldGenerator.PathHeight) _gameStateListener.LostGame();
 
             base.Update(deltaTime);
-
         }
 
         public override void Draw(bool alpha)
         {
-            return;
-            if (!alpha)
-            {
-                return;
-            }
-            var world = Matrix.CreateTranslation(position +  new Vector3(0,0.1f,0.5f)); // to fix player y-axis and z-axis
-            DrawModel(_model, world, VoxeLand.View, VoxeLand.Projection, boardDirection.X/50f, _scale);
+            if (!alpha) return;
+            var world = Matrix.CreateTranslation(position + new Vector3(0, 0.1f,
+                                                     0.5f)); // to fix player y-axis and z-axis
+            DrawModel(Model, world, VoxeLand.View, VoxeLand.Projection, _boardDirection.X / 50f, Scale);
             base.Draw(alpha);
         }
 
-        private void RotateHead(Model model){
-
+        private void RotateHead(Model model)
+        {
         }
 
         private void DrawModel(Model model, Matrix world, Matrix view, Matrix projection, float rotation, float scale)
@@ -144,10 +219,12 @@ namespace VertexWave
                     model.CopyAbsoluteBoneTransformsTo(modelTransforms);
 
                     effect.LightingEnabled = true;
-                    effect.AmbientLightColor = new Vector3(1,1,1);
+                    effect.AmbientLightColor = new Vector3(1, 1, 1);
 
 
-                    effect.World = modelTransforms[mesh.ParentBone.Index] * Matrix.CreateRotationZ(rotation) * Matrix.CreateScale(scale) * world;//where 'mesh' iterates through all objects in the model
+                    effect.World = modelTransforms[mesh.ParentBone.Index] * Matrix.CreateRotationZ(rotation) *
+                                   Matrix.CreateScale(scale) *
+                                   world; //where 'mesh' iterates through all objects in the model
 
                     effect.View = view;
                     effect.Projection = projection;
@@ -155,99 +232,6 @@ namespace VertexWave
 
                 mesh.Draw();
             }
-        }
-
-        public void OnConnectionEvent(bool status)
-        {
-            //throw new NotImplementedException();
-        }
-
-        public void OnMessageArrived(string message)
-        {
-            try
-            {
-                byte value;
-                Console.WriteLine("arrived");
-                try
-                {
-                    value = byte.Parse(message);
-                }
-                catch (OverflowException)
-                {
-                    //might occur sometimes if serial had problems reading
-                    return;
-                }
-
-                if (iteration == 0)// first byte must be 255
-                {
-                    if (value == 255)
-                    {
-                        iteration = 1;
-                        b_0 = 0;
-                        b_1 = 0;
-                    }
-                    return;
-                }
-
-                if (iteration == 1 || iteration == 2)// 1 byte
-                {
-                    b_0 = (byte)(b_0 | value);
-                    iteration++;
-                    return;
-                }
-
-                if (iteration == 3 || iteration == 4)// 2 byte
-                {
-                    b_1 = (byte)(b_1 | value);
-                    iteration++;
-
-                    if (iteration == 5)
-                    {
-                        iteration = 0;
-                    }
-                    else
-                    {
-                        return;
-                    }
-
-                }
-
-
-                byte[] bytes = { b_1, b_0 };
-
-                float axis = BitConverter.ToInt16(bytes, 0) / 100f;
-
-                if (!started)
-                {
-                    drift = axis;
-                    started = true;
-                }
-
-                axis -= drift;
-
-                boardDirection = new Vector3(axis, 0, 0);
-
-            }
-            catch (FormatException)
-            {
-                //might occur sometimes if serial had problems reading
-            }
-
-        }
-
-        public void LostGame()
-        {
-            isMoving = 0;
-        }
-
-        public void StartedGame()
-        {
-            isMoving = 1;
-        }
-
-        public void LoadedGame()
-        {
-            
         }
     }
 }

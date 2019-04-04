@@ -4,13 +4,11 @@ using VertexWave;
 
 namespace Voxeland.Generators.BlockTypes
 {
-
     public class BlockArrowLeft : DefaultBlock
     {
-
-        public void CreateBlock(List<VertexPositionColorLine> vertices, List<Color> colors, List<int> index, ref int blockNum, Vector3 pos, int nextZ, Color color, Block block)
+        public override void CreateBlock(List<VertexPositionColorLine> vertices, List<Color> colors, List<int> index,
+            ref int blockNum, Vector3 pos, int nextZ, Color color, Block block)
         {
-
             //line
             vertices.Add(new VertexPositionColorLine(new Vector3(0.9f, 0.33f, 0.5f) + pos, color));
             vertices.Add(new VertexPositionColorLine(new Vector3(0.9f, 0.66f, 0.5f) + pos, color));
@@ -53,8 +51,6 @@ namespace Voxeland.Generators.BlockTypes
             colors.Add(color);
             colors.Add(color);
             colors.Add(color);
-
         }
-
     }
 }

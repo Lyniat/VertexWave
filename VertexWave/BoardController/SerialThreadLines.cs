@@ -6,7 +6,6 @@
  * https://creativecommons.org/licenses/by/2.0/
  */
 
-using System;
 using System.IO.Ports;
 
 /**
@@ -21,9 +20,9 @@ using System.IO.Ports;
 public class SerialThreadLines : AbstractSerialThread
 {
     public SerialThreadLines(string portName,
-                             int baudRate,
-                             int delayBeforeReconnecting,
-                             int maxUnreadMessages)
+        int baudRate,
+        int delayBeforeReconnecting,
+        int maxUnreadMessages)
         : base(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages, true)
     {
     }

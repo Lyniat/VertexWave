@@ -4,40 +4,39 @@ using VertexWave;
 
 namespace Voxeland.Generators.BlockTypes
 {
-
     public class BlockFlower : DefaultBlock
     {
-
-        public void CreateBlock(List<VertexPositionColorLine> vertices, List<Color> colors, List<int> index, ref int blockNum, Vector3 pos, int nextZ, Color color, Block block)
+        public override void CreateBlock(List<VertexPositionColorLine> vertices, List<Color> colors, List<int> index,
+            ref int blockNum, Vector3 pos, int nextZ, Color color, Block block)
         {
             block.light = 255;
-            int texTopPosX = block.textureTop % 16;
-            int texTopPosY = block.textureTop / 16;
+            var texTopPosX = block.textureTop % 16;
+            var texTopPosY = block.textureTop / 16;
 
-            int texBottomPosX = block.textureBottom % 16;
-            int texBottomPosY = block.textureBottom / 16;
+            var texBottomPosX = block.textureBottom % 16;
+            var texBottomPosY = block.textureBottom / 16;
 
-            int texSidePosX = block.textureSide % 16;
-            int texSidePosY = block.textureSide / 16;
+            var texSidePosX = block.textureSide % 16;
+            var texSidePosY = block.textureSide / 16;
 
-            float blockSize = 1f / 16;
-            float texTopXPos = texTopPosX * blockSize;
-            float texTopYPos = texTopPosY * blockSize;
+            var blockSize = 1f / 16;
+            var texTopXPos = texTopPosX * blockSize;
+            var texTopYPos = texTopPosY * blockSize;
 
-            float texTopXPosEnd = (texTopPosX + 1) * blockSize;
-            float texTopYPosEnd = (texTopPosY + 1) * blockSize;
+            var texTopXPosEnd = (texTopPosX + 1) * blockSize;
+            var texTopYPosEnd = (texTopPosY + 1) * blockSize;
 
-            float texBottomXPos = texBottomPosX * blockSize;
-            float texBottomYPos = texBottomPosY * blockSize;
+            var texBottomXPos = texBottomPosX * blockSize;
+            var texBottomYPos = texBottomPosY * blockSize;
 
-            float texBottomXPosEnd = (texBottomPosX + 1) * blockSize;
-            float texBottomYPosEnd = (texBottomPosY + 1) * blockSize;
+            var texBottomXPosEnd = (texBottomPosX + 1) * blockSize;
+            var texBottomYPosEnd = (texBottomPosY + 1) * blockSize;
 
-            float texSideXPos = texSidePosX * blockSize;
-            float texSideYPos = texSidePosY * blockSize;
+            var texSideXPos = texSidePosX * blockSize;
+            var texSideYPos = texSidePosY * blockSize;
 
-            float texSideXPosEnd = (texSidePosX + 1) * blockSize;
-            float texSideYPosEnd = (texSidePosY + 1) * blockSize;
+            var texSideXPosEnd = (texSidePosX + 1) * blockSize;
+            var texSideYPosEnd = (texSidePosY + 1) * blockSize;
 
             var colorGreen = new Color(0, 255, 0);
 
@@ -113,8 +112,6 @@ namespace Voxeland.Generators.BlockTypes
             colors.Add(color);
             colors.Add(color);
             colors.Add(color);
-
         }
-           
     }
 }

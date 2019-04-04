@@ -1,67 +1,50 @@
-﻿using VertexWave.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using VertexWave.Interfaces;
 
 namespace VertexWave
 {
     public class GameStateListener
     {
-        private static List<IGameState> clients = new List<IGameState>();
+        private static readonly List<IGameState> Clients = new List<IGameState>();
 
         public void Add(IGameState e)
         {
-            lock (clients)
+            lock (Clients)
             {
-                if (!clients.Contains(e))
-                {
-                    clients.Add(e);
-                }
+                if (!Clients.Contains(e)) Clients.Add(e);
             }
         }
 
         public void Remove(IGameState e)
         {
-            lock (clients)
+            lock (Clients)
             {
-                if (clients.Contains(e))
-                {
-                    clients.Remove(e);
-                }
+                if (Clients.Contains(e)) Clients.Remove(e);
             }
         }
 
         public void LostGame()
         {
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
-                    c.LostGame();
-                }
+                foreach (var c in Clients) c.LostGame();
             }
         }
 
         public void StartedGame()
         {
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
-                    c.StartedGame();
-                }
+                foreach (var c in Clients) c.StartedGame();
             }
         }
 
         public void LoadedGame()
         {
-            lock (clients)
+            lock (Clients)
             {
-                foreach (var c in clients)
-                {
-                    c.LoadedGame();
-                }
+                foreach (var c in Clients) c.LoadedGame();
             }
         }
-
     }
 }

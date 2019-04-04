@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-
-namespace VertexWave
+﻿namespace VertexWave
 {
     public interface IDrawable
     {

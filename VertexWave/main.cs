@@ -3,36 +3,30 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using VertexWave.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using OculusRiftLib;
 using TrueCraft.Client.Rendering;
 using VertexWave;
-using Voxeland;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
+using VertexWave.Interfaces;
 
-class Program
+internal class Program
 {
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    static extern bool SetDllDirectory(string lpPathName);
+    private static extern bool SetDllDirectory(string lpPathName);
 
 
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         // https://github.com/FNA-XNA/FNA/wiki/4:-FNA-and-Windows-API#64-bit-support
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-        {
             SetDllDirectory(Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
                 Environment.Is64BitProcess ? "x64" : "x86"
             ));
-        }
 
         // https://github.com/FNA-XNA/FNA/wiki/7:-FNA-Environment-Variables#fna_graphics_enable_highdpi
         // NOTE: from documentation: 
@@ -41,10 +35,10 @@ class Program
         //           <string>True</string>
         Environment.SetEnvironmentVariable("FNA_GRAPHICS_ENABLE_HIGHDPI", "1");
 
-        using (VoxeLand game = new VoxeLand())
+        using (var game = new VoxeLand())
         {
-            bool isHighDPI = Environment.GetEnvironmentVariable("FNA_GRAPHICS_ENABLE_HIGHDPI") == "1";
-            if (isHighDPI)
+            var isHighDpi = Environment.GetEnvironmentVariable("FNA_GRAPHICS_ENABLE_HIGHDPI") == "1";
+            if (isHighDpi)
                 Debug.WriteLine("HiDPI Enabled");
 
             game.Run();
@@ -53,108 +47,100 @@ class Program
 }
 
 
-class VoxeLand : Game, IGameState
+internal class VoxeLand : Game, IGameState
 {
     public static List<Node> nodes = new List<Node>();
-    GraphicsDeviceManager graphics;
 
     public static Node root = new Node();
 
     public static VoxeLand game;
+
     // new code:
     //AlphaTestEffect effect;
     public static Effect effect;
-    //public static Effect tiltShiftEffect;
-    Effect alphaEffect;
 
-    BasicEffect basicEffect;
-
-
-    SpriteBatch spriteBatch;
-    //SpriteFont font;
-    Texture2D smile;
-    Effect exampleEffect;
-    private bool isServer;
-    private string ip;
-
-    public Camera camera;
-
-    private Vector3 camPosition = new Vector3(0, 7, 0);
-
-    GameTime gameTime;
-
-    FontRenderer font;
-
-    Player player;
-
-    private RenderTarget2D renderTarget { get; set; }
-    
-    private RenderTarget2D shadowRenderTarget { get; set; }
-    
-    private RenderTarget2D aoRenderTarget { get; set; }
-    
-    private RenderTarget2D BeforePostProcessTarget { get; set; }
-
-    private Texture2D shadowMap;
-    
-    Texture2D ssaoMap;
-    
-    Texture2D postProcess;
-
-
-    private long lastTime = 0;
-    private long lastCamera = 0;
-    double lastTimeFPS = 0;
-    
     private static readonly DateTime Start = DateTime.Now;
 
-    RasterizerState counterClockWise = new RasterizerState();
+    public static Matrix View;
 
-    private OculusRift rift = new OculusRift();
+    public static Matrix Projection;
 
-    RenderTarget2D[] renderTargetEye = new RenderTarget2D[2];
+    private readonly RasterizerState _counterClockWise = new RasterizerState();
 
-    SerialController serialController;
+    private readonly GameStateListener _gameStateListener;
+    private readonly GraphicsDeviceManager _graphics;
 
-    GameStateListener gameStateListener;
+    private readonly RenderTarget2D[] _renderTargetEye = new RenderTarget2D[2];
 
-    private Model keyboard;
-    private Model logo;
+    private readonly OculusRift _rift = new OculusRift();
 
-    private Logo logoObject;
+    //public static Effect tiltShiftEffect;
+    private Effect _alphaEffect;
 
-    private List<Song> musicTracks;
+    private BasicEffect _basicEffect;
+
+    private Vector3 _camPosition = new Vector3(0, 7, 0);
+    private Effect _exampleEffect;
+
+    private FontRenderer _font;
+
+    private GameTime _gameTime;
+    private string _ip;
+    private bool _isServer;
+
+    private Model _keyboard;
+    private long _lastCamera;
+
+
+    private long _lastTime;
+    private double _lastTimeFps;
+    private Model _logo;
+
+    private Logo _logoObject;
+    private bool _lost;
+
+    private float _modeFactor = 1;
+    private float _modeTimer = 1;
+
+    private List<Song> _musicTracks;
+
+    private Player _player;
+
+    private Texture2D _postProcess;
+
+    private Random _random;
+
+    private SerialController _serialController;
+
+    private Texture2D _shadowMap;
 
 
     //Timer
-    private long sinceLoaded = 0;
-    private long sinceStarted = 0;
-    private long sinceLost = 0;
-    private float modeTimer = 1;
-    private bool started = false;
-    private bool lost = false;
+    private long _sinceLoaded;
+    private long _sinceLost;
 
-    float modeFactor = 1;
+    private long _sinceStarted;
 
-    float startModeFactor = 1;
+    //SpriteFont font;
+    private Texture2D _smile;
 
-    public static Matrix View;
-    public static Matrix Projection;
 
-    private Random random;
+    private SpriteBatch _spriteBatch;
 
-    public static long CurrentTimeMillis()
-    {
-        return (long) (DateTime.Now - Start).TotalMilliseconds;
-    }
+    private Texture2D _ssaoMap;
+    private bool _started;
+
+    private float _startModeFactor = 1;
+
+    public Camera camera;
 
     public VoxeLand()
     {
-        graphics = new GraphicsDeviceManager(this);
-        graphics.PreferredBackBufferWidth = 800;
-        graphics.PreferredBackBufferHeight = 600;
-        graphics.GraphicsProfile = GraphicsProfile.HiDef;
-        graphics.SynchronizeWithVerticalRetrace = false;
+        _graphics = new GraphicsDeviceManager(this);
+        _graphics.PreferredBackBufferWidth = 800;
+        _graphics.PreferredBackBufferHeight = 600;
+        _graphics.GraphicsProfile = GraphicsProfile.HiDef;
+        _graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
 
         Content.RootDirectory = Configuration.Path;
@@ -170,16 +156,60 @@ class VoxeLand : Game, IGameState
 
         //effect = new AlphaTestEffect(GraphicsDevice);//Content.Load<Effect>("diffuse_shader.fbx");
 
-        counterClockWise.CullMode = CullMode.CullClockwiseFace;
+        _counterClockWise.CullMode = CullMode.CullClockwiseFace;
 
-        gameStateListener = new GameStateListener();
-        gameStateListener.Add(this);
+        _gameStateListener = new GameStateListener();
+        _gameStateListener.Add(this);
+    }
+
+    private RenderTarget2D RenderTarget { get; set; }
+
+    private RenderTarget2D ShadowRenderTarget { get; set; }
+
+    private RenderTarget2D AoRenderTarget { get; set; }
+
+    private RenderTarget2D BeforePostProcessTarget { get; set; }
+
+    public void LostGame()
+    {
+        if (_lost == false)
+        {
+            _sinceLost = 0;
+            _lost = true;
+        }
+    }
+
+    public void StartedGame()
+    {
+        _sinceStarted = 0;
+        _started = true;
+
+        var trackNum = _random.Next(0, _musicTracks.Count);
+
+        MediaPlayer.Play(_musicTracks[trackNum]);
+        MediaPlayer.Volume = 1;
+    }
+
+    public void LoadedGame()
+    {
+        MediaPlayer.Stop();
+        _sinceLoaded = 0;
+        _sinceStarted = 0;
+        _lost = false;
+        _started = false;
+        _modeFactor = 1;
+        _modeTimer = 1;
+    }
+
+    public static long CurrentTimeMillis()
+    {
+        return (long) (DateTime.Now - Start).TotalMilliseconds;
     }
 
     protected override void Initialize()
     {
         // initialize the Rift
-        int result = rift.Init(GraphicsDevice);
+        var result = _rift.Init(GraphicsDevice);
         if (result != 0)
             throw new InvalidOperationException("rift.Init result: " + result);
 
@@ -189,17 +219,17 @@ class VoxeLand : Game, IGameState
 
     protected override void LoadContent()
     {
-        random = new Random(DateTime.Now.Millisecond);
-        //keyboard = Content.Load<Model>("keyboard");
-        //logo = Content.Load<Model>("logo");
+        _random = new Random(DateTime.Now.Millisecond);
+        _keyboard = Content.Load<Model>("keyboard");
+        _logo = Content.Load<Model>("logo");
 
-        basicEffect = new BasicEffect(GraphicsDevice);
+        _basicEffect = new BasicEffect(GraphicsDevice);
 
         //var conf = File.ReadAllText(Configuration.Path + "conf.json");
         //JObject jConf = JObject.Parse(conf);
 
-        isServer = false;// (bool)jConf["server"];
-        ip = "0";// (string)jConf["ip"];
+        _isServer = false; // (bool)jConf["server"];
+        _ip = "0"; // (string)jConf["ip"];
 
         //root.Add(new Client());
         //Client.SetServerIP(ip);
@@ -210,27 +240,27 @@ class VoxeLand : Game, IGameState
         }
         */
 
-        player = new Player(keyboard,new Vector3(0, WorldGenerator.PathHeight+2, 0));
+        _player = new Player(_keyboard, new Vector3(0, WorldGenerator.PathHeight + 2, 0));
 
-        //logoObject = new Logo(logo, new Vector3(0, WorldGenerator.PathHeight + 20, 0));
+        _logoObject = new Logo(_logo, new Vector3(0, WorldGenerator.PathHeight + 20, 0));
 
-        root.Add(player);
+        root.Add(_player);
 
-        //root.Add(logoObject);
+        root.Add(_logoObject);
 
-        serialController = new SerialController(player);
+        _serialController = new SerialController(_player);
 
         //camera = new Camera(new Vector3(0, 100, 0), new Vector3(0, 0, 0), Vector3.UnitZ);
 
-        camera = new Camera(player);
+        camera = new Camera(_player);
 
-        player.SetCamera(camera);
+        _player.SetCamera(camera);
 
         GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 
 
-        gameTime = new GameTime();
-        spriteBatch = new SpriteBatch(GraphicsDevice);
+        _gameTime = new GameTime();
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // Most content can be loaded from MonoGame Content Builder projects.
         // (Note how "Content.mgcb" has the Build Action "MonoGameContentReference".)
@@ -242,10 +272,10 @@ class VoxeLand : Game, IGameState
         //exampleEffect = new Effect(GraphicsDevice, File.ReadAllBytes(@"Effects/ExampleEffect.fxb"));
         //FileStream font = new FileStream("Fonts/Pixel_Regulat.fnt", FileMode.Open);
 
-        font = new FontRenderer(
-                new Font(Content, "Fonts/Pixel"),
-                new Font(Content, "Fonts/Pixel", FontStyle.Bold), null, null,
-                new Font(Content, "Fonts/Pixel", FontStyle.Italic));
+        _font = new FontRenderer(
+            new Font(Content, "Fonts/Pixel"),
+            new Font(Content, "Fonts/Pixel", FontStyle.Bold), null, null,
+            new Font(Content, "Fonts/Pixel", FontStyle.Italic));
 
         //effect = Content.Load<Effect>("shader.fxc");
 
@@ -262,33 +292,35 @@ class VoxeLand : Game, IGameState
         }
 
 */
-        
-        effect = Content.Load<Effect> ("Shader");  
 
-        PresentationParameters pp = GraphicsDevice.PresentationParameters;
-        renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
-        aoRenderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, false, SurfaceFormat.Single, DepthFormat.Depth24);
-        BeforePostProcessTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
-        shadowRenderTarget = new RenderTarget2D(GraphicsDevice, 4096, 4096, false, SurfaceFormat.Single, DepthFormat.Depth24);
+        effect = Content.Load<Effect>("Shader");
+
+        var pp = GraphicsDevice.PresentationParameters;
+        RenderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true,
+            GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
+        AoRenderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, false,
+            SurfaceFormat.Single, DepthFormat.Depth24);
+        BeforePostProcessTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true,
+            GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
+        ShadowRenderTarget =
+            new RenderTarget2D(GraphicsDevice, 4096, 4096, false, SurfaceFormat.Single, DepthFormat.Depth24);
 
         // create one rendertarget for each eye
-            for (int eye = 0; eye < 2; eye++) {
-                renderTargetEye[eye] = rift.CreateRenderTargetForEye(eye);
-            }
+        for (var eye = 0; eye < 2; eye++) _renderTargetEye[eye] = _rift.CreateRenderTargetForEye(eye);
 
         LoadMusic();
     }
 
     private void LoadMusic()
     {
-        musicTracks = new List<Song>();
-        musicTracks.Add(Content.Load<Song>("music/activation"));
-        musicTracks.Add(Content.Load<Song>("music/escape-from-reality"));
-        musicTracks.Add(Content.Load<Song>("music/impact"));
-        musicTracks.Add(Content.Load<Song>("music/overtake"));
-        musicTracks.Add(Content.Load<Song>("music/sequential-movement"));
-        musicTracks.Add(Content.Load<Song>("music/street-traffic"));
-        musicTracks.Add(Content.Load<Song>("music/turismo"));
+        _musicTracks = new List<Song>();
+        _musicTracks.Add(Content.Load<Song>("music/activation"));
+        _musicTracks.Add(Content.Load<Song>("music/escape-from-reality"));
+        _musicTracks.Add(Content.Load<Song>("music/impact"));
+        _musicTracks.Add(Content.Load<Song>("music/overtake"));
+        _musicTracks.Add(Content.Load<Song>("music/sequential-movement"));
+        _musicTracks.Add(Content.Load<Song>("music/street-traffic"));
+        _musicTracks.Add(Content.Load<Song>("music/turismo"));
     }
 
     /*
@@ -307,7 +339,6 @@ class VoxeLand : Game, IGameState
 
         base.UnloadContent();
     }
-
 
 
     protected override void Update(GameTime gameTime)
@@ -337,75 +368,55 @@ class VoxeLand : Game, IGameState
         if (Keyboard.GetState().IsKeyDown(Keys.Escape))
         {
             Exit();
-            System.Environment.Exit(0);
+            Environment.Exit(0);
         }
-        var current  = CurrentTimeMillis();
-        var delta = current - lastTime;
-        lastTime = current;
 
-        sinceLoaded += delta;
-        sinceStarted += delta;
-        sinceLost += delta;
+        var current = CurrentTimeMillis();
+        var delta = current - _lastTime;
+        _lastTime = current;
+
+        _sinceLoaded += delta;
+        _sinceStarted += delta;
+        _sinceLost += delta;
 
         var deltaPercent = delta / 60f;
 
-        serialController.Update();
+        _serialController.Update();
 
         root.Update(deltaPercent);
 
         // update head tracking
-        rift.TrackHead();
+        _rift.TrackHead();
 
-        if(sinceStarted / 1000 > 30)
-        {
-            modeTimer -= delta/5000f;
-        }
+        if (_sinceStarted / 1000 > 30) _modeTimer -= delta / 5000f;
 
-        if(modeTimer > 1)
-        {
-            modeTimer = 1;
-        }
+        if (_modeTimer > 1) _modeTimer = 1;
 
-        if (modeTimer < 0)
-        {
-            modeTimer = 0;
-        }
+        if (_modeTimer < 0) _modeTimer = 0;
 
-        modeFactor = modeTimer;
+        _modeFactor = _modeTimer;
 
-        if(!started && sinceLoaded/1000 > 10)
-        {
-            gameStateListener.StartedGame();
-        }
+        if (!_started && _sinceLoaded / 1000 > 10) _gameStateListener.StartedGame();
 
-        Console.WriteLine(sinceLost);
+        Console.WriteLine(_sinceLost);
 
-        if (lost)
-        {
-            MediaPlayer.Volume = 1 - (sinceLost / 3000f);
-        }
+        if (_lost) MediaPlayer.Volume = 1 - _sinceLost / 3000f;
 
-        if(lost && sinceLost/1000 > 3)
-        {
-            Reset();
-        }
+        if (_lost && _sinceLost / 1000 > 3) Reset();
 
-        startModeFactor = 1 + player.position.Z / 80f;
+        _startModeFactor = 1 + _player.position.Z / 80f;
 
-        if(startModeFactor < 0)
-        {
-            startModeFactor = 0;
-        }
+        if (_startModeFactor < 0) _startModeFactor = 0;
 
         base.Update(gameTime);
     }
 
     private void Reset()
     {
-        player.position = new Vector3(0, WorldGenerator.PathHeight + 2, 0);
-        started = false;
-        lost = false;
-        gameStateListener.LoadedGame();
+        _player.position = new Vector3(0, WorldGenerator.PathHeight + 2, 0);
+        _started = false;
+        _lost = false;
+        _gameStateListener.LoadedGame();
     }
 
 
@@ -415,22 +426,21 @@ class VoxeLand : Game, IGameState
 
         double time = gameTime.ElapsedGameTime.Milliseconds;
 
-        double fps = 1.0 / (time / 1000);
+        var fps = 1.0 / (time / 1000);
 
-        lastTimeFPS = time;
+        _lastTimeFps = time;
 
 
         //spriteBatch.End();
 
-        float delta = CurrentTimeMillis() - (float)lastCamera;
-        lastCamera = CurrentTimeMillis();
-        player.Update(delta);
+        var delta = CurrentTimeMillis() - (float) _lastCamera;
+        _lastCamera = CurrentTimeMillis();
+        _player.Update(delta);
         camera.Update(delta);
         //Thread.Sleep(10);
-        for (int eye = 0; eye < 2; eye++)
+        for (var eye = 0; eye < 2; eye++)
         {
-
-            GraphicsDevice.RasterizerState = counterClockWise;
+            GraphicsDevice.RasterizerState = _counterClockWise;
 
             //GraphicsDevice.SetRenderTarget(shadowRenderTarget);
             //GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
@@ -451,19 +461,18 @@ class VoxeLand : Game, IGameState
 
             */
 
-            GraphicsDevice.SetRenderTarget(renderTargetEye[eye]);
+            GraphicsDevice.SetRenderTarget(_renderTargetEye[eye]);
 
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
-            DrawScene("ShadowedScene",eye);
+            DrawScene("ShadowedScene", eye);
             //DrawScene("Water",eye);
-            shadowMap = null;
+            _shadowMap = null;
 
             //base.Draw(gameTime);
 
-            postProcess = (Texture2D)BeforePostProcessTarget;
+            _postProcess = BeforePostProcessTarget;
 
             GraphicsDevice.SetRenderTarget(null);
-
         }
 
         //GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
@@ -482,89 +491,85 @@ class VoxeLand : Game, IGameState
 
         //GraphicsDevice.SetRenderTarget(null);
 
-        double dist = Math.Sqrt(Math.Pow(player.position.X - camera.position.X, 2) +
-                                Math.Pow(player.position.Y - camera.position.Y, 2) +
-                                Math.Pow(player.position.Z - camera.position.Z, 2));
+        var dist = Math.Sqrt(Math.Pow(_player.position.X - camera.position.X, 2) +
+                             Math.Pow(_player.position.Y - camera.position.Y, 2) +
+                             Math.Pow(_player.position.Z - camera.position.Z, 2));
 
         dist /= camera.Distance; //get value between 0 and 1
-        
+
         Console.WriteLine(dist);
 
-        
 
-        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, 
-            SamplerState.LinearClamp, DepthStencilState.Default, 
+        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+            SamplerState.LinearClamp, DepthStencilState.Default,
             RasterizerState.CullNone);
-        
+
         //tiltShiftEffect.Parameters["xSSAOMap"].SetValue(ssaoMap);
         //tiltShiftEffect.Parameters["xPlayerDistance"].SetValue((float)dist);
- 
-        spriteBatch.Draw(postProcess, new Rectangle(0, 0,GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width , GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height), Color.White);
- 
-        spriteBatch.End();
-        
-        
-        
-        
-        
-        spriteBatch.Begin();
-        
-        string fpsString = ((int)fps).ToString();
-        font.DrawText(spriteBatch, 0, 0, fpsString, 5);
 
-        string timeString = Enviroment.Hours.ToString() + ":" + Enviroment.Minutes.ToString();
-        font.DrawText(spriteBatch, 0, 150, $"x:{player.position.X}" , 5);
-        font.DrawText(spriteBatch, 0, 300, $"z:{player.position.Z}" , 5);
-        spriteBatch.End();
+        _spriteBatch.Draw(_postProcess,
+            new Rectangle(0, 0, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height), Color.White);
+
+        _spriteBatch.End();
+
+
+        _spriteBatch.Begin();
+
+        var fpsString = ((int) fps).ToString();
+        _font.DrawText(_spriteBatch, 0, 0, fpsString, 5);
+
+        var timeString = Enviroment.Hours + ":" + Enviroment.Minutes;
+        _font.DrawText(_spriteBatch, 0, 150, $"x:{_player.position.X}", 5);
+        _font.DrawText(_spriteBatch, 0, 300, $"z:{_player.position.Z}", 5);
+        _spriteBatch.End();
 
         // submit rendertargets to the Rift
-        int result = rift.SubmitRenderTargets(renderTargetEye[0], renderTargetEye[1]);
+        var result = _rift.SubmitRenderTargets(_renderTargetEye[0], _renderTargetEye[1]);
 
         DrawEyeViewIntoBackbuffer(0);
 
 
         //base.Draw(gameTime);
-
     }
 
-    void DrawEyeViewIntoBackbuffer(int eye)
+    private void DrawEyeViewIntoBackbuffer(int eye)
     {
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
 
         var pp = GraphicsDevice.PresentationParameters;
 
-        int height = pp.BackBufferHeight;
-        int width = Math.Min(pp.BackBufferWidth, (int)(height * rift.GetRenderTargetAspectRatio(eye)));
-        int offset = (pp.BackBufferWidth - width) / 2;
+        var height = pp.BackBufferHeight;
+        var width = Math.Min(pp.BackBufferWidth, (int) (height * _rift.GetRenderTargetAspectRatio(eye)));
+        var offset = (pp.BackBufferWidth - width) / 2;
 
-        spriteBatch.Begin();
-        spriteBatch.Draw(renderTargetEye[eye], new Rectangle(offset, 0, width, height), Color.White);
-        spriteBatch.End();
+        _spriteBatch.Begin();
+        _spriteBatch.Draw(_renderTargetEye[eye], new Rectangle(offset, 0, width, height), Color.White);
+        _spriteBatch.End();
     }
 
-    void DrawScene(string technique, int eye = -1)
+    private void DrawScene(string technique, int eye = -1)
     {
-
         var ambientPower = 0.5f;
 
-        var lightPos = new Vector3(0,130,0);
+        var lightPos = new Vector3(0, 130, 0);
 
         //lightPos.Y = 300;
 
-        lightPos.X = ((int)player.position.X/8)*8;
-        lightPos.Z = ((int)player.position.Z/8)*8;
+        lightPos.X = (int) _player.position.X / 8 * 8;
+        lightPos.Z = (int) _player.position.Z / 8 * 8;
 
         var lightPower = 0.5f;
- 
-        Matrix lightsView = Matrix.CreateLookAt(lightPos, lightPos+new Vector3(0,-1,0), new Vector3(0, 0, 1));
+
+        var lightsView = Matrix.CreateLookAt(lightPos, lightPos + new Vector3(0, -1, 0), new Vector3(0, 0, 1));
         //Matrix lightsProjection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, 1f, 0.1f, 100f);
-        Matrix lightsProjection = Matrix.CreateOrthographic(800, 800, 1, 130);
- 
+        var lightsProjection = Matrix.CreateOrthographic(800, 800, 1, 130);
+
         var lightsViewProjectionMatrix = lightsView * lightsProjection;
-        
+
         Matrix matrix;
-        
+
         View = Matrix.Identity;
         /*
         if(eye != -1)
@@ -577,35 +582,36 @@ class VoxeLand : Game, IGameState
         }
         */
 
-        Projection = Matrix.Identity;// =camera.projection;
+        Projection = Matrix.Identity; // =camera.projection;
         if (eye != -1)
         {
-            View = rift.GetEyeViewMatrix(eye, Matrix.CreateTranslation(player.position + new Vector3(0,1.5f,0)));
-            Projection = rift.GetProjectionMatrix(eye);
+            View = _rift.GetEyeViewMatrix(eye, Matrix.CreateTranslation(_player.position + new Vector3(0, 1.5f, 0)));
+            Projection = _rift.GetProjectionMatrix(eye);
         }
+
         Matrix.Multiply(ref View, ref Projection, out matrix);
-        
+
         effect.CurrentTechnique = effect.Techniques[technique];
         effect.Parameters["xWorldViewProjection"].SetValue(Matrix.Identity * View * Projection);
-        effect.Parameters["xCamPosition"].SetValue(player.position + new Vector3(0, 1.5f, 0));
+        effect.Parameters["xCamPosition"].SetValue(_player.position + new Vector3(0, 1.5f, 0));
         effect.Parameters["xWorld"].SetValue(Matrix.Identity);
         effect.Parameters["xLightPos"].SetValue(lightPos);
         effect.Parameters["xLightPower"].SetValue(lightPower);
         effect.Parameters["xAmbient"].SetValue(ambientPower);
         effect.Parameters["xLightsWorldViewProjection"].SetValue(Matrix.Identity * lightsViewProjectionMatrix);
-        effect.Parameters["xFogDistance"].SetValue((float)12 * 16);
-        effect.Parameters["xFogGradient"].SetValue((float)2 * 16);
+        effect.Parameters["xFogDistance"].SetValue((float) 12 * 16);
+        effect.Parameters["xFogGradient"].SetValue((float) 2 * 16);
         effect.Parameters["xFogColor"].SetValue(Color.CornflowerBlue.ToVector3());
-        effect.Parameters["xModeFactor"].SetValue(modeFactor);
-        effect.Parameters["xStartModeFactor"].SetValue(startModeFactor);
+        effect.Parameters["xModeFactor"].SetValue(_modeFactor);
+        effect.Parameters["xStartModeFactor"].SetValue(_startModeFactor);
 
         byte referenceAlpha = 0b11111111;
-            
-        
-        Vector4 alphaTest = new Vector4();
-        
+
+
+        var alphaTest = new Vector4();
+
         const float threshold = 0.5f / 255f;
-        float reference = (float)referenceAlpha / 255f;
+        var reference = referenceAlpha / 255f;
         alphaTest.X = reference;
         alphaTest.Y = threshold;
         alphaTest.Z = 1;
@@ -626,16 +632,13 @@ class VoxeLand : Game, IGameState
         }
 
         if (true)
-        {
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
- 
+
                 root.Draw(false);
                 root.Draw(true);
-            
             }
-        }
 
 
         /*
@@ -710,36 +713,5 @@ class VoxeLand : Game, IGameState
         }
         
         */
-    }
-
-    public void LostGame()
-    {
-        if(lost == false)
-        {
-            sinceLost = 0;
-            lost = true;
-        }
-    }
-
-    public void StartedGame()
-    {
-        sinceStarted = 0;
-        started = true;
-
-        var trackNum = random.Next(0, musicTracks.Count);
-
-        MediaPlayer.Play(musicTracks[trackNum]);
-        MediaPlayer.Volume = 1;
-    }
-
-    public void LoadedGame()
-    {
-        MediaPlayer.Stop();
-        sinceLoaded = 0;
-        sinceStarted = 0;
-        lost = false;
-        started = false;
-        modeFactor = 1;
-        modeTimer = 1;
     }
 }
