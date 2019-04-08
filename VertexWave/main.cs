@@ -134,11 +134,19 @@ internal class VoxeLand : Game, IGameState
 
     public Camera camera;
 
+    protected override void OnExiting(Object sender, EventArgs args)
+    {
+        Environment.Exit(Environment.ExitCode);
+        base.OnExiting(sender, args);
+
+    }
+
     public VoxeLand()
     {
         _graphics = new GraphicsDeviceManager(this);
-        _graphics.PreferredBackBufferWidth = 800;
-        _graphics.PreferredBackBufferHeight = 600;
+        _graphics.PreferredBackBufferWidth = 1920;
+        _graphics.PreferredBackBufferHeight = 1080;
+        _graphics.IsFullScreen = false;
         _graphics.GraphicsProfile = GraphicsProfile.HiDef;
         _graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
@@ -473,6 +481,10 @@ internal class VoxeLand : Game, IGameState
             _postProcess = BeforePostProcessTarget;
 
             GraphicsDevice.SetRenderTarget(null);
+
+            //For display
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+            DrawScene("ShadowedScene", eye);
         }
 
         //GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
