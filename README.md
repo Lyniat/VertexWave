@@ -12,4 +12,4 @@ World genertion could be faster and also the game is sometimes a bit laggy.
 If you know how to fix this, feel free to contribute.
 
 ### License
-see [Vertex Wave](vertexwave.network)
+see [Vertex Wave](https://vertexwave.network)
