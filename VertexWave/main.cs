@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Lifetime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -77,9 +78,6 @@ internal class VoxeLand : Game, IGameState
     //public static Effect tiltShiftEffect;
     private Effect _alphaEffect;
 
-    private BasicEffect _basicEffect;
-
-    private Vector3 _camPosition = new Vector3(0, 7, 0);
     private Effect _exampleEffect;
 
     private FontRenderer _font;
@@ -93,7 +91,6 @@ internal class VoxeLand : Game, IGameState
 
 
     private long _lastTime;
-    private double _lastTimeFps;
     private Model _logo;
 
     private Logo _logoObject;
@@ -106,13 +103,12 @@ internal class VoxeLand : Game, IGameState
 
     private Player _player;
 
-    private Texture2D _postProcess;
-
     private Random _random;
 
     private SerialController _serialController;
 
-    private Texture2D _shadowMap;
+
+    private bool _riftAvailable = true;
 
 
     //Timer
@@ -121,13 +117,10 @@ internal class VoxeLand : Game, IGameState
 
     private long _sinceStarted;
 
-    //SpriteFont font;
-    private Texture2D _smile;
 
 
     private SpriteBatch _spriteBatch;
 
-    private Texture2D _ssaoMap;
     private bool _started;
 
     private float _startModeFactor = 1;
@@ -219,7 +212,9 @@ internal class VoxeLand : Game, IGameState
         // initialize the Rift
         var result = _rift.Init(GraphicsDevice);
         if (result != 0)
-            throw new InvalidOperationException("rift.Init result: " + result);
+        {
+            _riftAvailable = false;
+        }
 
         base.Initialize();
     }
@@ -314,7 +309,11 @@ internal class VoxeLand : Game, IGameState
             new RenderTarget2D(GraphicsDevice, 4096, 4096, false, SurfaceFormat.Single, DepthFormat.Depth24);
 
         // create one rendertarget for each eye
-        for (var eye = 0; eye < 2; eye++) _renderTargetEye[eye] = _rift.CreateRenderTargetForEye(eye);
+        if (_riftAvailable)
+        {
+            for (var eye = 0; eye < 2; eye++) _renderTargetEye[eye] = _rift.CreateRenderTargetForEye(eye);
+        }
+
 
         LoadMusic();
     }
@@ -352,27 +351,6 @@ internal class VoxeLand : Game, IGameState
     protected override void Update(GameTime gameTime)
     {
         OnInput();
-        //Input.Update(IsActive);
-
-        //
-        // Asset Rebuilding:
-#if DEBUG
-        //if(Input.KeyWentDown(Keys.F5))
-        {
-            //if(AssetRebuild.Run())
-            {
-                //UnloadContent();
-                //LoadContent();
-            }
-        }
-
-#endif
-        //
-        // Insert your game update logic here.
-        //
-
-        //Console.WriteLine("updating");
-        //camPosition += new Vector3(1, 0, 0) * gameTime.ElapsedGameTime.Milliseconds/100f;
 
         if (Keyboard.GetState().IsKeyDown(Keys.Escape))
         {
@@ -407,7 +385,6 @@ internal class VoxeLand : Game, IGameState
 
         if (!_started && _sinceLoaded / 1000 > 10) _gameStateListener.StartedGame();
 
-        Console.WriteLine(_sinceLost);
 
         if (_lost) MediaPlayer.Volume = 1 - _sinceLost / 3000f;
 
@@ -469,85 +446,44 @@ internal class VoxeLand : Game, IGameState
         _player.Update(delta);
         camera.Update(delta);
         //Thread.Sleep(10);
-        for (var eye = 0; eye < 2; eye++)
+        if (_riftAvailable)
+        {
+            for (var eye = 0; eye < 2; eye++)
+            {
+                GraphicsDevice.RasterizerState = _counterClockWise;
+
+                GraphicsDevice.SetRenderTarget(_renderTargetEye[eye]);
+
+                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+                DrawScene("ShadowedScene", eye);
+                //DrawScene("Water",eye);
+                _shadowMap = null;
+
+                //base.Draw(gameTime);
+
+                _postProcess = BeforePostProcessTarget;
+
+                GraphicsDevice.SetRenderTarget(null);
+
+                //For display
+                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+                DrawScene("ShadowedScene", eye);
+            }
+        }
+        else
         {
             GraphicsDevice.RasterizerState = _counterClockWise;
-
-            //GraphicsDevice.SetRenderTarget(shadowRenderTarget);
-            //GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
-
-            /*
-            DrawScene("ShadowMap");
-            GraphicsDevice.SetRenderTarget(null);
-            shadowMap = (Texture2D)shadowRenderTarget;
-
-            GraphicsDevice.SetRenderTarget(aoRenderTarget);
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
-
-
-            DrawScene("SSAO",eye);
-
-            GraphicsDevice.SetRenderTarget(null);
-            ssaoMap = (Texture2D)aoRenderTarget;
-
-            */
-
-            GraphicsDevice.SetRenderTarget(_renderTargetEye[eye]);
-
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
-            DrawScene("ShadowedScene", eye);
-            //DrawScene("Water",eye);
-            _shadowMap = null;
-
-            //base.Draw(gameTime);
-
-            _postProcess = BeforePostProcessTarget;
 
             GraphicsDevice.SetRenderTarget(null);
 
             //For display
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
-            DrawScene("ShadowedScene", eye);
+            DrawScene("ShadowedScene", -1);
         }
-
-        //GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
-
-        //GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
-        /*
-        Matrix world = Matrix.CreateTranslation(camPosition - new Vector3(0,5,0));
-        Matrix view = Matrix.CreateLookAt(new Vector3(0, 0, 10), new Vector3(0, 0, 0), Vector3.UnitY);
-        Matrix projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), 800f / 480f, 0.1f, 100f);
-        */
-
-
-        //Console.WriteLine(Process.GetCurrentProcess().Threads.Count);
-
-        //font.DrawText(spriteBatch, 0, 0, time.ToString(), 5);
-
-        //GraphicsDevice.SetRenderTarget(null);
 
         var dist = Math.Sqrt(Math.Pow(_player.position.X - camera.position.X, 2) +
                              Math.Pow(_player.position.Y - camera.position.Y, 2) +
                              Math.Pow(_player.position.Z - camera.position.Z, 2));
-
-        dist /= camera.Distance; //get value between 0 and 1
-
-        Console.WriteLine(dist);
-
-
-        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
-            SamplerState.LinearClamp, DepthStencilState.Default,
-            RasterizerState.CullNone);
-
-        //tiltShiftEffect.Parameters["xSSAOMap"].SetValue(ssaoMap);
-        //tiltShiftEffect.Parameters["xPlayerDistance"].SetValue((float)dist);
-
-        _spriteBatch.Draw(_postProcess,
-            new Rectangle(0, 0, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height), Color.White);
-
-        _spriteBatch.End();
-
 
         _spriteBatch.Begin();
 
@@ -559,11 +495,12 @@ internal class VoxeLand : Game, IGameState
         _font.DrawText(_spriteBatch, 0, 300, $"z:{_player.position.Z}", 5);
         _spriteBatch.End();
 
-        // submit rendertargets to the Rift
-        var result = _rift.SubmitRenderTargets(_renderTargetEye[0], _renderTargetEye[1]);
+        if (_riftAvailable)
+        {
+            var result = _rift.SubmitRenderTargets(_renderTargetEye[0], _renderTargetEye[1]);
 
-        DrawEyeViewIntoBackbuffer(0);
-
+            DrawEyeViewIntoBackbuffer(0);
+        }
 
         //base.Draw(gameTime);
     }
@@ -622,6 +559,11 @@ internal class VoxeLand : Game, IGameState
         {
             View = _rift.GetEyeViewMatrix(eye, Matrix.CreateTranslation(_player.position + new Vector3(0, 1.5f, 0)));
             Projection = _rift.GetProjectionMatrix(eye);
+        }
+        else
+        {
+            View = camera.View;
+            Projection = camera.Projection;
         }
 
         Matrix.Multiply(ref View, ref Projection, out matrix);

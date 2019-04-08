@@ -19,8 +19,6 @@ namespace VertexWave
 
         private Vector3 _boardDirection = Vector3.Zero;
 
-        private float _directionX;
-        private float _directionZ;
         private float _drift;
 
         private int _isMoving;
@@ -156,32 +154,6 @@ namespace VertexWave
 
         public override void Update(float deltaTime)
         {
-            /*
-            var speed = 0.01f;
-            var direction = position - mCamera.position; 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) || Keyboard.GetState().IsKeyDown(Keys.W))
-            {
-                Move(direction * speed);
-                playerMovementListener.PlayerMovedX(position.X);
-                playerMovementListener.PlayerMovedZ(position.Z);
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
-            {
-                Move(-direction * speed/2);
-                playerMovementListener.PlayerMovedX(position.X);
-                playerMovementListener.PlayerMovedZ(position.Z);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                Jump(0.3f);
-            }
-
-            var newDirection = Vector3.Normalize(direction);
-            _rotation = (float)Math.Atan2(newDirection.X, newDirection.Z);
-            light = World.GetLightAt((int)position.X, (int)position.Y, (int)position.Z);
-
-    */
 
             var direction = new Vector3(0, 0, -1);
             direction += _boardDirection / -15f;
@@ -205,9 +177,6 @@ namespace VertexWave
             base.Draw(alpha);
         }
 
-        private void RotateHead(Model model)
-        {
-        }
 
         private void DrawModel(Model model, Matrix world, Matrix view, Matrix projection, float rotation, float scale)
         {

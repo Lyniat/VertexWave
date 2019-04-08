@@ -57,7 +57,6 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Enviroment.cs" />
-    <Compile Include="EnviromentListener.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="FontRenderer.cs" />
     <Compile Include="FontStyle.cs" />

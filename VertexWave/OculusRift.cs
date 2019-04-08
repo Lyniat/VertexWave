@@ -67,7 +67,9 @@ namespace OculusRiftLib
             int result;
 
             if ((result = NativeRift.Init(dxDevice, dxContext)) < 0)
+            {
                 return result;
+            }
 
             HmdInfo = NativeRift.GetHmdInfo();
 
