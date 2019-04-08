@@ -351,6 +351,7 @@ internal class VoxeLand : Game, IGameState
 
     protected override void Update(GameTime gameTime)
     {
+        OnInput();
         //Input.Update(IsActive);
 
         //
@@ -417,6 +418,28 @@ internal class VoxeLand : Game, IGameState
         if (_startModeFactor < 0) _startModeFactor = 0;
 
         base.Update(gameTime);
+    }
+
+    private void OnInput()
+    {
+        KeyboardState state = Keyboard.GetState();
+        var isInput = false;
+        if (state.IsKeyDown(Keys.Right))
+        {
+            _player.OnInput(-15);
+            isInput = true;
+        }
+
+        if (state.IsKeyDown(Keys.Left))
+        {
+            _player.OnInput(15);
+            isInput = true;
+        }
+
+        if (!isInput)
+        {
+            _player.OnInput(0);
+        }
     }
 
     private void Reset()

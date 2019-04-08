@@ -77,6 +77,11 @@ namespace VertexWave
             //throw new NotImplementedException();
         }
 
+        public void OnInput(float axis)
+        {
+            _boardDirection = new Vector3(axis, 0, 0);
+        }
+
         public void OnMessageArrived(string message)
         {
             try
