@@ -14,4 +14,28 @@ If you know how to fix this, feel free to contribute.
 ### License
 - MIT
 - see subfolders for own licenses
-- by Laurin Muth
+- by Laurin Muth and Philipp Schuhbauer
+
+#### Music:
+- Music by Spaceinvader from Fugue (https://icons8.com/license)
+
+#### Models:
+##### Keyboard
+- https://sketchfab.com/3d-models/keyboard-960408b88eff435c9dc8460be40308a4
+
+- License: CC Attribution
+
+- by: simserg (https://sketchfab.com/simserg)
+
+#### Code:
+##### Font Rendering (MonoGame)
+- https://github.com/ddevault/TrueCraft
+
+##### Ardity
+- https://ardity.dwilches.com/
+
+##### FastNoise
+- https://github.com/Auburns/FastNoise_CSharp
+
+##### OculusRift4MonoGame
+- https://github.com/steemwheedle/OculusRift4MonoGame
