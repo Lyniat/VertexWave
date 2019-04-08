@@ -73,13 +73,13 @@ namespace VertexWave
                 ResetMouse();
             }
 
-            /*
+            
             if (mouseState.RightButton == ButtonState.Released)
             {
                 _oldMouseX = -1;
                 _oldMouseY = -1;
             }
-            */
+            
 
             var newDistance = _distanceToPlayer;
 

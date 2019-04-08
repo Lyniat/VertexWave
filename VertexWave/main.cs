@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Lifetime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -226,23 +225,6 @@ internal class VoxeLand : Game, IGameState
         _keyboard = Content.Load<Model>("keyboard");
         _logo = Content.Load<Model>("logo");
 
-        _basicEffect = new BasicEffect(GraphicsDevice);
-
-        //var conf = File.ReadAllText(Configuration.Path + "conf.json");
-        //JObject jConf = JObject.Parse(conf);
-
-        _isServer = false; // (bool)jConf["server"];
-        _ip = "0"; // (string)jConf["ip"];
-
-        //root.Add(new Client());
-        //Client.SetServerIP(ip);
-        /*
-        if (isServer)
-        {
-            root.Add(new Server());
-        }
-        */
-
         _player = new Player(_keyboard, new Vector3(0, WorldGenerator.PathHeight + 2, 0));
 
         _logoObject = new Logo(_logo, new Vector3(0, WorldGenerator.PathHeight + 20, 0));
@@ -252,8 +234,6 @@ internal class VoxeLand : Game, IGameState
         root.Add(_logoObject);
 
         _serialController = new SerialController(_player);
-
-        //camera = new Camera(new Vector3(0, 100, 0), new Vector3(0, 0, 0), Vector3.UnitZ);
 
         camera = new Camera(_player);
 
@@ -265,16 +245,6 @@ internal class VoxeLand : Game, IGameState
         _gameTime = new GameTime();
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // Most content can be loaded from MonoGame Content Builder projects.
-        // (Note how "Content.mgcb" has the Build Action "MonoGameContentReference".)
-        //font = Content.Load<SpriteFont>("Fonts/Pixel_Regular.fnt");
-        //terrain = Content.Load<Texture2D>("terrain.png");
-
-        // Effects need to be loaded from files built by fxc.exe from the DirectX SDK (June 2010)
-        // (Note how each .fx file has the Build Action "CompileShader", which produces a .fxb file.)
-        //exampleEffect = new Effect(GraphicsDevice, File.ReadAllBytes(@"Effects/ExampleEffect.fxb"));
-        //FileStream font = new FileStream("Fonts/Pixel_Regulat.fnt", FileMode.Open);
-
         _font = new FontRenderer(
             new Font(Content, "Fonts/Pixel"),
             new Font(Content, "Fonts/Pixel", FontStyle.Bold), null, null,
@@ -283,18 +253,6 @@ internal class VoxeLand : Game, IGameState
         //effect = Content.Load<Effect>("shader.fxc");
 
         var r = new Random();
-
-        //var  newBear = new NPC("bear", new Vector3(0, 100, 0));
-        //root.Add(newBear);
-
-        /*
-        for (var i = 0; i < 100; i++)
-        {
-            newBear = new NPC("bear", new Vector3((float)r.NextDouble() * 20f + i, 100, (float)r.NextDouble() * 20f + i));
-            root.Add(newBear);
-        }
-
-*/
 
         effect = Content.Load<Effect>("Shader");
 
@@ -436,16 +394,11 @@ internal class VoxeLand : Game, IGameState
 
         var fps = 1.0 / (time / 1000);
 
-        _lastTimeFps = time;
-
-
-        //spriteBatch.End();
 
         var delta = CurrentTimeMillis() - (float) _lastCamera;
         _lastCamera = CurrentTimeMillis();
         _player.Update(delta);
         camera.Update(delta);
-        //Thread.Sleep(10);
         if (_riftAvailable)
         {
             for (var eye = 0; eye < 2; eye++)
@@ -456,12 +409,6 @@ internal class VoxeLand : Game, IGameState
 
                 GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
                 DrawScene("ShadowedScene", eye);
-                //DrawScene("Water",eye);
-                _shadowMap = null;
-
-                //base.Draw(gameTime);
-
-                _postProcess = BeforePostProcessTarget;
 
                 GraphicsDevice.SetRenderTarget(null);
 
@@ -481,10 +428,7 @@ internal class VoxeLand : Game, IGameState
             DrawScene("ShadowedScene", -1);
         }
 
-        var dist = Math.Sqrt(Math.Pow(_player.position.X - camera.position.X, 2) +
-                             Math.Pow(_player.position.Y - camera.position.Y, 2) +
-                             Math.Pow(_player.position.Z - camera.position.Z, 2));
-
+        /* optional for debug
         _spriteBatch.Begin();
 
         var fpsString = ((int) fps).ToString();
@@ -494,6 +438,7 @@ internal class VoxeLand : Game, IGameState
         _font.DrawText(_spriteBatch, 0, 150, $"x:{_player.position.X}", 5);
         _font.DrawText(_spriteBatch, 0, 300, $"z:{_player.position.Z}", 5);
         _spriteBatch.End();
+        */
 
         if (_riftAvailable)
         {
@@ -527,15 +472,13 @@ internal class VoxeLand : Game, IGameState
 
         var lightPos = new Vector3(0, 130, 0);
 
-        //lightPos.Y = 300;
-
         lightPos.X = (int) _player.position.X / 8 * 8;
         lightPos.Z = (int) _player.position.Z / 8 * 8;
 
         var lightPower = 0.5f;
 
         var lightsView = Matrix.CreateLookAt(lightPos, lightPos + new Vector3(0, -1, 0), new Vector3(0, 0, 1));
-        //Matrix lightsProjection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, 1f, 0.1f, 100f);
+
         var lightsProjection = Matrix.CreateOrthographic(800, 800, 1, 130);
 
         var lightsViewProjectionMatrix = lightsView * lightsProjection;
@@ -543,16 +486,6 @@ internal class VoxeLand : Game, IGameState
         Matrix matrix;
 
         View = Matrix.Identity;
-        /*
-        if(eye != -1)
-        {
-            view = camera.GetEye(eye);
-        }
-        else
-        {
-            view = camera.view;
-        }
-        */
 
         Projection = Matrix.Identity; // =camera.projection;
         if (eye != -1)
@@ -617,78 +550,5 @@ internal class VoxeLand : Game, IGameState
                 root.Draw(true);
             }
 
-
-        /*
-        //effect.View = camera.view;
-        effect.Parameters["AlphaTest"].SetValue(0b11111111);
-        effect.Parameters["Texture"].SetValue(terrain);
-        effect.Parameters["WorldViewProj"].SetValue(matrix);
-        var light = (float)Enviroment.Brigthness + 0.15f;
-        if (light > 1)
-        {
-            light = 1;
-        }
-        var ambientLight = (float)Enviroment.Brigthness + 0.2f;
-        if (ambientLight > 1)
-        {
-            ambientLight = 1;
-        }
-        effect.Parameters["DiffuseColor"].SetValue(new Color(ambientLight, ambientLight, ambientLight).ToVector3());
-        effect.Parameters["Light"].SetValue(light);
-
-*/
-        //effect.AlphaFunction = CompareFunction.Equal;
-        //effect.ReferenceAlpha = 255;
-
-        // effect.VertexColorEnabled = true;
-        // effect.Texture = terrain;
-
-        /*
-        float aspectRatio =
-            graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
-        //float fieldOfView = Microsoft.Xna.Framework.MathHelper.PiOver4;
-        //float nearClipPlane = 1;
-        //float farClipPlane = 500;
-
-        //effect.Projection = camera.projection;
-        //effect.Parameters["Projection"].SetValue(camera.projection);
-        Matrix world = Matrix.CreateTranslation(new Vector3(0, 0, 0));
-        // effect.Parameters["WorldInverseTranspose"].SetValue(world);
-
-        //effect.EnableDefaultLighting();
-        // effect.FogEnabled = true;
-        // effect.FogColor = Enviroment.SkyColor.ToVector3();
-        // effect.FogStart = (ChunkManager.MaxChunkDistance - 1) * WorldGenerator.ChunkSize;
-        // effect.FogEnd = ChunkManager.MaxChunkDistance * WorldGenerator.ChunkSize + WorldGenerator.ChunkSize / 4;
-        //effect.EmissiveColor = new Vector3(1, 0, 0);
-
-
-        GraphicsDevice.RasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-        GraphicsDevice.BlendState = BlendState.Opaque;
-
-        GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-        foreach (var pass in effect.CurrentTechnique.Passes)
-        {
-            pass.Apply();
-
-            root.Draw(false);
-           
-        }
-
-        GraphicsDevice.RasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-        GraphicsDevice.BlendState = BlendState.Opaque;
-
-        GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-        foreach (var pass in effect.CurrentTechnique.Passes)
-        {
-            pass.Apply();
-
-            root.Draw(true);
-
-        }
-        
-        */
     }
 }
