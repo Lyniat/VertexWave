@@ -6,6 +6,8 @@
  * https://creativecommons.org/licenses/by/2.0/
  */
 
+using System.IO.Ports;
+using System.Linq;
 using System.Threading;
 using VertexWave.BoardController;
 
@@ -53,6 +55,8 @@ public class SerialController
     // Internal reference to the Thread and the object that runs in it.
     protected Thread thread;
 
+    private bool _available = false;
+
 
     // ------------------------------------------------------------------------
     // Invoked whenever the SerialController gameobject is activated.
@@ -62,6 +66,14 @@ public class SerialController
     public SerialController(IMessageListener messageListener)
     {
         _messageListener = messageListener;
+
+        //check if port is available
+        if (!SerialPort.GetPortNames().ToList().Contains(portName))
+        {
+            return; //if port is not available
+        }
+
+        _available = true;
 
         serialThread = new SerialThreadLines(portName,
             baudRate,
@@ -107,6 +119,10 @@ public class SerialController
     // ------------------------------------------------------------------------
     public void Update()
     {
+        if (!_available)
+        {
+            return;
+        }
         //var length = 0;// port.ReadByte();
         //_messageListener.OnMessageArrived("" + length);
 
