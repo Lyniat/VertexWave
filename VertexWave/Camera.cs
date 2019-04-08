@@ -15,7 +15,7 @@ namespace VertexWave
 
         private Vector3 _cameraDirection;
 
-        private float _height;
+        private float _height = 1;
 
 
         private int _oldMouseX = -1;
