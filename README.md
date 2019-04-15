@@ -12,6 +12,5 @@ World genertion could be faster and also the game is sometimes a bit laggy.
 If you know how to fix this, feel free to contribute.
 
 ### License
-- MIT
-- see subfolders for own licenses
-- by Laurin Muth
+by Laurin Muth and Philipp Schuhbauer
+see [Vertex Wave](https://vertexwave.network)
