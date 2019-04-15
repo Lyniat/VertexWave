@@ -357,6 +357,10 @@ internal class VoxeLand : Game, IGameState
 
     private void OnInput()
     {
+        if (_riftAvailable)
+        {
+            return;
+        }
         KeyboardState state = Keyboard.GetState();
         var isInput = false;
         if (state.IsKeyDown(Keys.Right))
@@ -375,6 +379,7 @@ internal class VoxeLand : Game, IGameState
         {
             _player.OnInput(0);
         }
+        
     }
 
     private void Reset()
