@@ -1,17 +1,25 @@
+#if OPENGL
+#define VS_SHADERMODEL vs_3_0
+#define PS_SHADERMODEL ps_3_0
+#else
+#define VS_SHADERMODEL vs_5_0
+#define PS_SHADERMODEL ps_5_0
+#endif
+
 float4x4 xWorldViewProjection;
-float4x4 xLightsWorldViewProjection;
-float4x4 xWorld;
-float3 xLightPos;
-float4 xAlphaTest;
+//float4x4 xLightsWorldViewProjection;
+//float4x4 xWorld;
+//float3 xLightPos;
+//float4 xAlphaTest;
 float3 xCamPosition;
-float xLightPower;
-float xAmbient;
-float xTime;
-float xTransparent;
-float4 xFogColor;
-float xFogDistance;
-float xFogGradient;
-float xFogValue;
+//float xLightPower;
+//float xAmbient;
+//float xTime;
+//float xTransparent;
+//float4 xFogColor;
+//float xFogDistance;
+//float xFogGradient;
+//float xFogValue;
 
 float xModeFactor;
 float xStartModeFactor;
@@ -182,7 +190,7 @@ technique ShadowedScene
 {
     pass Pass0
     {
-        VertexShader = compile vs_5_0 ShadowedSceneVertexShader();
-        PixelShader = compile ps_5_0 ShadowedScenePixelShader();
+        VertexShader = compile VS_SHADERMODEL ShadowedSceneVertexShader();
+        PixelShader = compile PS_SHADERMODEL ShadowedScenePixelShader();
     }
 }

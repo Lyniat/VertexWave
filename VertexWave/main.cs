@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using OculusRiftLib;
 using TrueCraft.Client.Rendering;
 using VertexWave;
 using VertexWave.Interfaces;
@@ -71,13 +70,6 @@ internal class VoxeLand : Game, IGameState
     private readonly GraphicsDeviceManager _graphics;
 
     private readonly RenderTarget2D[] _renderTargetEye = new RenderTarget2D[2];
-
-    private readonly OculusRift _rift = new OculusRift();
-
-    //public static Effect tiltShiftEffect;
-    private Effect _alphaEffect;
-
-    private Effect _exampleEffect;
 
     private FontRenderer _font;
 
@@ -154,8 +146,6 @@ internal class VoxeLand : Game, IGameState
 
         game = this;
 
-        //effect = new AlphaTestEffect(GraphicsDevice);//Content.Load<Effect>("diffuse_shader.fbx");
-
         _counterClockWise.CullMode = CullMode.CullClockwiseFace;
 
         _gameStateListener = new GameStateListener();
@@ -208,13 +198,6 @@ internal class VoxeLand : Game, IGameState
 
     protected override void Initialize()
     {
-        // initialize the Rift
-        var result = _rift.Init(GraphicsDevice);
-        if (result != 0)
-        {
-            _riftAvailable = false;
-        }
-
         base.Initialize();
     }
 
@@ -250,8 +233,6 @@ internal class VoxeLand : Game, IGameState
             new Font(Content, "Fonts/Pixel", FontStyle.Bold), null, null,
             new Font(Content, "Fonts/Pixel", FontStyle.Italic));
 
-        //effect = Content.Load<Effect>("shader.fxc");
-
         var r = new Random();
 
         effect = Content.Load<Effect>("Shader");
@@ -266,26 +247,22 @@ internal class VoxeLand : Game, IGameState
         ShadowRenderTarget =
             new RenderTarget2D(GraphicsDevice, 4096, 4096, false, SurfaceFormat.Single, DepthFormat.Depth24);
 
-        // create one rendertarget for each eye
-        if (_riftAvailable)
-        {
-            for (var eye = 0; eye < 2; eye++) _renderTargetEye[eye] = _rift.CreateRenderTargetForEye(eye);
-        }
-
 
         LoadMusic();
     }
 
     private void LoadMusic()
     {
-        _musicTracks = new List<Song>();
-        _musicTracks.Add(Content.Load<Song>("music/activation"));
-        _musicTracks.Add(Content.Load<Song>("music/escape-from-reality"));
-        _musicTracks.Add(Content.Load<Song>("music/impact"));
-        _musicTracks.Add(Content.Load<Song>("music/overtake"));
-        _musicTracks.Add(Content.Load<Song>("music/sequential-movement"));
-        _musicTracks.Add(Content.Load<Song>("music/street-traffic"));
-        _musicTracks.Add(Content.Load<Song>("music/turismo"));
+        _musicTracks = new List<Song>
+        {
+            Content.Load<Song>("music/activation"),
+            Content.Load<Song>("music/escape-from-reality"),
+            Content.Load<Song>("music/impact"),
+            Content.Load<Song>("music/overtake"),
+            Content.Load<Song>("music/sequential-movement"),
+            Content.Load<Song>("music/street-traffic"),
+            Content.Load<Song>("music/turismo")
+        };
     }
 
     /*
@@ -329,9 +306,6 @@ internal class VoxeLand : Game, IGameState
         _serialController.Update();
 
         root.Update(deltaPercent);
-
-        // update head tracking
-        _rift.TrackHead();
 
         if (_sinceStarted / 1000 > 30) _modeTimer -= delta / 5000f;
 
@@ -444,32 +418,11 @@ internal class VoxeLand : Game, IGameState
         _font.DrawText(_spriteBatch, 0, 300, $"z:{_player.position.Z}", 5);
         _spriteBatch.End();
         */
-
-        if (_riftAvailable)
-        {
-            var result = _rift.SubmitRenderTargets(_renderTargetEye[0], _renderTargetEye[1]);
-
-            DrawEyeViewIntoBackbuffer(0);
-        }
+      
 
         //base.Draw(gameTime);
     }
 
-    private void DrawEyeViewIntoBackbuffer(int eye)
-    {
-        GraphicsDevice.SetRenderTarget(null);
-        GraphicsDevice.Clear(Color.Black);
-
-        var pp = GraphicsDevice.PresentationParameters;
-
-        var height = pp.BackBufferHeight;
-        var width = Math.Min(pp.BackBufferWidth, (int) (height * _rift.GetRenderTargetAspectRatio(eye)));
-        var offset = (pp.BackBufferWidth - width) / 2;
-
-        _spriteBatch.Begin();
-        _spriteBatch.Draw(_renderTargetEye[eye], new Rectangle(offset, 0, width, height), Color.White);
-        _spriteBatch.End();
-    }
 
     private void DrawScene(string technique, int eye = -1)
     {
@@ -493,36 +446,29 @@ internal class VoxeLand : Game, IGameState
         View = Matrix.Identity;
 
         Projection = Matrix.Identity; // =camera.projection;
-        if (eye != -1)
-        {
-            View = _rift.GetEyeViewMatrix(eye, Matrix.CreateTranslation(_player.position + new Vector3(0, 1.5f, 0)));
-            Projection = _rift.GetProjectionMatrix(eye);
-        }
-        else
-        {
-            View = camera.View;
-            Projection = camera.Projection;
-        }
+
+       View = camera.View;
+        Projection = camera.Projection;
 
         Matrix.Multiply(ref View, ref Projection, out matrix);
 
         effect.CurrentTechnique = effect.Techniques[technique];
         effect.Parameters["xWorldViewProjection"].SetValue(Matrix.Identity * View * Projection);
         effect.Parameters["xCamPosition"].SetValue(_player.position + new Vector3(0, 1.5f, 0));
-        effect.Parameters["xWorld"].SetValue(Matrix.Identity);
-        effect.Parameters["xLightPos"].SetValue(lightPos);
-        effect.Parameters["xLightPower"].SetValue(lightPower);
-        effect.Parameters["xAmbient"].SetValue(ambientPower);
-        effect.Parameters["xLightsWorldViewProjection"].SetValue(Matrix.Identity * lightsViewProjectionMatrix);
-        effect.Parameters["xFogDistance"].SetValue((float) 12 * 16);
-        effect.Parameters["xFogGradient"].SetValue((float) 2 * 16);
-        effect.Parameters["xFogColor"].SetValue(Color.CornflowerBlue.ToVector3());
+        //effect.Parameters["xWorld"].SetValue(Matrix.Identity);
+        //effect.Parameters["xLightPos"].SetValue(lightPos);
+        //effect.Parameters["xLightPower"].SetValue(lightPower);
+        //effect.Parameters["xAmbient"].SetValue(ambientPower);
+        //effect.Parameters["xLightsWorldViewProjection"].SetValue(Matrix.Identity * lightsViewProjectionMatrix);
+        //effect.Parameters["xFogDistance"].SetValue((float) 12 * 16);
+        //effect.Parameters["xFogGradient"].SetValue((float) 2 * 16);
+        //effect.Parameters["xFogColor"].SetValue(Color.CornflowerBlue.ToVector3());
         effect.Parameters["xModeFactor"].SetValue(_modeFactor);
         effect.Parameters["xStartModeFactor"].SetValue(_startModeFactor);
 
         byte referenceAlpha = 0b11111111;
 
-
+        /*
         var alphaTest = new Vector4();
 
         const float threshold = 0.5f / 255f;
@@ -532,6 +478,7 @@ internal class VoxeLand : Game, IGameState
         alphaTest.Z = 1;
         alphaTest.W = -1;
         effect.Parameters["xAlphaTest"].SetValue(alphaTest);
+        */
 
 
         if (technique == "Water")
