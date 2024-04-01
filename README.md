@@ -8,9 +8,7 @@ You can play it by using a [real skateboard wih an M5Stack](m5stack), if you con
 Vertex Wave is written in C# with MonoGame and supports the Oculus Rift HMD on Windows.
 The world is procedurally generated with voxels.
 
-## Contribution
-World genertion could be faster and also the game is sometimes a bit laggy.
-If you know how to fix this, feel free to contribute.
+![screenshot](vertex_wave.gif)
 
 ### License
 Copyright Laurin Muth
